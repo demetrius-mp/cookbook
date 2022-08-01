@@ -1,3 +1,3 @@
-<div class="container mt-5 mx-auto px-4 sm:px-6 lg:px-8">
+<div class="container my-5 mx-auto px-4 sm:px-6 lg:px-8">
 	<slot />
 </div>
