@@ -1,4 +1,6 @@
 <script lang="ts">
+	import toastStore from '$lib/components/Toast/toast.store';
+
 	import type { Recipe } from '$lib/types';
 
 	let recipe: Recipe = {
@@ -12,6 +14,15 @@
 	};
 
 	function removeItem(index: number) {
+		if (recipe.items.length === 1) {
+			toastStore.push({
+				kind: 'error',
+				message: 'You must keep at least 1 item.',
+				removeAfter: 3000
+			});
+
+			return;
+		}
 		recipe.items = recipe.items.filter((_, i) => i !== index);
 	}
 
