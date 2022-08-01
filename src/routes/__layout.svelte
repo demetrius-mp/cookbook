@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { session } from '$app/stores';
-	import Container from '$lib/components/Container.svelte';
-	import DrawerContent from '$lib/components/DrawerContent.svelte';
-	import DrawerLayout from '$lib/components/DrawerLayout.svelte';
-	import Navbar from '$lib/components/Navbar.svelte';
+	import Container from '$lib/components/Container/Container.svelte';
+	import DrawerContent from '$lib/components/DrawerContent/DrawerContent.svelte';
+	import DrawerLayout from '$lib/components/DrawerLayout/DrawerLayout.svelte';
+	import Navbar from '$lib/components/Navbar/Navbar.svelte';
 	import '../app.css';
 </script>
 
