@@ -86,7 +86,7 @@
 	<div class="divider" />
 	<div class="card bg-base-200 w-full shadow-xl mb-4">
 		<div class="card-body p-5">
-			{#each recipe.items as item, i}
+			{#each recipe.items as recipeItem, i}
 				<div class="flex justify-between">
 					<h2 class="card-title">Item {i + 1}</h2>
 					<button type="button" on:click={() => removeItem(i)} class="btn btn-square btn-sm">
@@ -113,12 +113,10 @@
 					<div>
 						<Autocomplete
 							options={items}
-							key={'id'}
-							label={'name'}
-							value={{
-								id: item.id
-							}}
-							on:selected={(e) => (item.id = e.detail.id)}
+							labelKey={'name'}
+							selectedId={recipeItem.id}
+							idKey={'id'}
+							on:select={(e) => (recipeItem.id = e.detail.id)}
 						/>
 					</div>
 				</div>
@@ -127,7 +125,7 @@
 						<span class="label-text">Amount</span>
 					</label>
 					<input
-						bind:value={item.amount}
+						bind:value={recipeItem.amount}
 						required
 						name="amount"
 						type="number"
