@@ -1,27 +1,44 @@
+<script lang="ts" context="module">
+	export const load: Load = async ({ fetch }) => {
+		const r = await fetch('/items.json');
+		const items = (await r.json()) as Item[];
+
+		return {
+			props: {
+				items
+			}
+		};
+	};
+</script>
+
 <script lang="ts">
+	import toastStore from '$lib/components/Toast/toast.store';
+
 	import { formatCurrency } from '$lib/formatter';
+	import type { Item } from '@prisma/client';
+	import type { Load } from '@sveltejs/kit';
 
-	interface Item {
-		name: string;
-		amountKind: string;
-		baseAmount: string;
-		price: number;
+	export let items: Item[];
+
+	async function deleteItem(id: string) {
+		if (!confirm('Are you sure you want to delete this item?')) return;
+
+		await fetch(`/items/${id}`, {
+			method: 'DELETE',
+			headers: {
+				Accept: 'application/json'
+			}
+		});
+
+		toastStore.push({
+			kind: 'success',
+			message: 'Item deleted successfully',
+			removeAfter: 2000
+		});
+
+		const r = await fetch('/items.json');
+		items = (await r.json()) as Item[];
 	}
-
-	let items: Item[] = [
-		{
-			name: 'Frango',
-			amountKind: 'gramas',
-			baseAmount: '100',
-			price: 12
-		},
-		{
-			name: 'Arroz',
-			amountKind: 'gramas',
-			baseAmount: '100',
-			price: 4
-		}
-	];
 </script>
 
 <div class="flex sm:flex-row flex-col justify-between items-center mb-5 gap-3">
@@ -33,8 +50,8 @@
 	</div>
 </div>
 
-<div class="overflow-x-auto w-full">
-	<table class="table table-zebra w-full">
+<div class="overflow-x-auto w-full rounded-lg shadow-lg ring-base-300">
+	<table class="table w-full">
 		<thead>
 			<tr>
 				<th>Name</th>
@@ -61,7 +78,7 @@
 						</div>
 					</td>
 					<td class="w-0">
-						<button class="btn btn-sm">
+						<button on:click={() => deleteItem(item.id)} class="btn btn-sm">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								class="h-6 w-6"
@@ -78,6 +95,10 @@
 							</svg>
 						</button>
 					</td>
+				</tr>
+			{:else}
+				<tr>
+					<td colspan="3"> No records found. </td>
 				</tr>
 			{/each}
 		</tbody>
