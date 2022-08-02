@@ -1,13 +1,37 @@
+<script lang="ts" context="module">
+	export const load: Load = async ({ fetch }) => {
+		const r = await fetch('/items.json');
+		const items = (await r.json()) as Item[];
+
+		return {
+			props: {
+				items
+			}
+		};
+	};
+</script>
+
 <script lang="ts">
+	import Autocomplete from '$lib/components/Autocomplete/Autocomplete.svelte';
 	import toastStore from '$lib/components/Toast/toast.store';
+	import type { Item } from '@prisma/client';
+	import type { Load } from '@sveltejs/kit';
 
-	import type { Recipe } from '$lib/types';
+	export let items: Item[];
 
-	let recipe: Recipe = {
+	interface FormProps {
+		name: string;
+		items: {
+			id: string;
+			amount: number;
+		}[];
+	}
+
+	let recipe: FormProps = {
 		items: [
 			{
-				name: '',
-				weight: 0
+				id: '',
+				amount: 0
 			}
 		],
 		name: ''
@@ -31,8 +55,8 @@
 		recipe.items = [
 			...recipe.items,
 			{
-				name: '',
-				weight: 0
+				id: '',
+				amount: 0
 			}
 		];
 	}
@@ -86,22 +110,26 @@
 					<label for="itemName" class="label">
 						<span class="label-text">Item name</span>
 					</label>
-					<input
-						bind:value={item.name}
-						required
-						name="itemName"
-						type="text"
-						class="input input-bordered w-full"
-					/>
+					<div>
+						<Autocomplete
+							options={items}
+							key={'id'}
+							label={'name'}
+							value={{
+								id: item.id
+							}}
+							on:selected={(e) => (item.id = e.detail.id)}
+						/>
+					</div>
 				</div>
 				<div class="form-control w-full">
-					<label for="weight" class="label">
-						<span class="label-text">Item weight (in grams)</span>
+					<label for="amount" class="label">
+						<span class="label-text">Amount</span>
 					</label>
 					<input
-						bind:value={item.weight}
+						bind:value={item.amount}
 						required
-						name="weight"
+						name="amount"
 						type="number"
 						class="input input-bordered w-full"
 					/>
