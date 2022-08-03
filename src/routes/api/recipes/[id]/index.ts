@@ -1,9 +1,9 @@
 import prisma from '$lib/prisma';
 import type { RequestHandler } from '@sveltejs/kit';
 
-// delete item by id
+// delete recipe by id
 export const DELETE: RequestHandler = async ({ params }) => {
-	await prisma.item.update({
+	await prisma.recipe.update({
 		where: {
 			id: params.id
 		},

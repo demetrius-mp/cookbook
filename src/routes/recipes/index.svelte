@@ -1,8 +1,6 @@
 <script lang="ts" context="module">
 	export const load: Load = async ({ fetch }) => {
-		const r = await fetch('/api/recipes');
-
-		const recipes = (await r.json()) as Recipes;
+		const recipes = await loadRecipes({ fetch });
 
 		return {
 			props: {
@@ -14,13 +12,14 @@
 
 <script lang="ts">
 	import { formatCurrency } from '$lib/formatter';
-
 	import type { Load } from '@sveltejs/kit';
-	import type { GetOutput as Recipes } from 'src/routes/api/recipes';
+	import type { ApiRecipeOutput as Recipe } from 'src/routes/api/recipes';
+	import { deleteRecipe, loadRecipes } from '$lib/repositories/recipe.repository';
+	import toastStore from '$lib/components/Toast/toast.store';
 
-	export let recipes: Recipes;
+	export let recipes: Recipe[];
 
-	let computedRecipes = recipes.map((recipe) => {
+	$: computedRecipes = recipes.map((recipe) => {
 		const recipeItems = recipe.items.map((item) => {
 			return {
 				...item,
@@ -34,6 +33,21 @@
 			totalPrice: recipeItems.reduce((partial, { computedPrice }) => partial + computedPrice, 0)
 		};
 	});
+
+	async function handleDeleteRecipe(id: string) {
+		const confirmDelete = confirm('Are you sure you want to delete this item?');
+		if (!confirmDelete) return;
+
+		await deleteRecipe({ id });
+
+		toastStore.push({
+			kind: 'success',
+			message: 'Item deleted successfully',
+			removeAfter: 2000
+		});
+
+		recipes = await loadRecipes({});
+	}
 </script>
 
 <div class="flex sm:flex-row flex-col justify-between items-center mb-5 gap-3">
@@ -52,7 +66,11 @@
 				<div class="card-body p-5">
 					<div class="flex justify-between gap-3">
 						<h2 class="card-title">{recipe.name}</h2>
-						<button type="button" class="btn btn-square btn-sm">
+						<button
+							on:click={() => handleDeleteRecipe(recipe.id)}
+							type="button"
+							class="btn btn-square btn-sm"
+						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								class="h-6 w-6"

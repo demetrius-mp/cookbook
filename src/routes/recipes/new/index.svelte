@@ -14,13 +14,14 @@
 	import Autocomplete from '$lib/components/Autocomplete/Autocomplete.svelte';
 	import toastStore from '$lib/components/Toast/toast.store';
 	import { loadItems } from '$lib/repositories/item.repository';
+	import { createRecipe } from '$lib/repositories/recipe.repository';
 	import type { Item } from '@prisma/client';
 	import type { Load } from '@sveltejs/kit';
-	import type { CustomRecipeCreateInput } from 'src/routes/api/recipes';
+	import type { ApiRecipeCreateInput } from 'src/routes/api/recipes';
 
 	export let items: Item[];
 
-	let recipe: CustomRecipeCreateInput = {
+	let recipe: ApiRecipeCreateInput = {
 		items: [],
 		name: ''
 	};
@@ -52,9 +53,8 @@
 	}
 
 	async function handleSubmit() {
-		await fetch('/api/recipes', {
-			method: 'POST',
-			body: JSON.stringify(recipe)
+		await createRecipe({
+			recipe
 		});
 
 		toastStore.push({

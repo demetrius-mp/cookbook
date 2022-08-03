@@ -11,7 +11,6 @@ const globalFetch = fetch;
 type LoadItemsInput = BaseInput;
 
 export async function loadItems({ fetch = globalFetch }: LoadItemsInput): Promise<Item[]> {
-	// const fetch = input?.fetch
 	const r = await fetch('/api/items', {
 		headers: {
 			Accept: 'application/json'

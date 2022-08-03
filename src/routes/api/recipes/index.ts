@@ -2,7 +2,7 @@ import prisma from '$lib/prisma';
 import type { Prisma, Recipe } from '@prisma/client';
 import type { RequestHandler } from '@sveltejs/kit';
 
-export type CustomRecipeCreateInput = {
+export type ApiRecipeCreateInput = {
 	name: string;
 	items: {
 		id: string;
@@ -11,7 +11,7 @@ export type CustomRecipeCreateInput = {
 };
 
 export const POST: RequestHandler = async ({ request }) => {
-	const body = (await request.json()) as CustomRecipeCreateInput;
+	const body = (await request.json()) as ApiRecipeCreateInput;
 
 	const recipe = await prisma.recipe.create({
 		data: {
@@ -52,6 +52,9 @@ export const GET: RequestHandler = async () => {
 		},
 		orderBy: {
 			name: 'asc'
+		},
+		where: {
+			state: 'VISIBLE'
 		}
 	});
 
@@ -60,7 +63,7 @@ export const GET: RequestHandler = async () => {
 	};
 };
 
-export type GetOutput = (Recipe & {
+export type ApiRecipeOutput = Recipe & {
 	items: {
 		item: {
 			name: string;
@@ -71,4 +74,4 @@ export type GetOutput = (Recipe & {
 		amount: number;
 	}[];
 	_count: Prisma.RecipeCountOutputType;
-})[];
+};

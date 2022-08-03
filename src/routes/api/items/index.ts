@@ -20,6 +20,9 @@ export const GET: RequestHandler = async () => {
 	const items = await prisma.item.findMany({
 		orderBy: {
 			name: 'asc'
+		},
+		where: {
+			state: 'VISIBLE'
 		}
 	});
 
