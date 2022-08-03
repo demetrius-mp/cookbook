@@ -13,7 +13,7 @@
 <script lang="ts">
 	import toastStore from '$lib/components/Toast/toast.store';
 
-	import { formatCurrency } from '$lib/formatter';
+	import { formatCurrency } from '$lib/utils/formatting.util';
 	import trpcClient from '$lib/trpcClient';
 	import type { Item } from '@prisma/client';
 	import type { Load } from '@sveltejs/kit';

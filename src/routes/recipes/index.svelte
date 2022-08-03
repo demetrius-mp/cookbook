@@ -11,7 +11,7 @@
 </script>
 
 <script lang="ts">
-	import { formatCurrency } from '$lib/formatter';
+	import { formatCurrency } from '$lib/utils/formatting.util';
 	import type { Load } from '@sveltejs/kit';
 	import toastStore from '$lib/components/Toast/toast.store';
 	import trpcClient, { type InferQueryOutput } from '$lib/trpcClient';

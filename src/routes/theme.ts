@@ -1,4 +1,4 @@
-import { isTheme } from '$lib/types';
+import { isTheme } from '$lib/utils/theme.util';
 import type { RequestHandler } from '@sveltejs/kit';
 import { serialize } from 'cookie';
 

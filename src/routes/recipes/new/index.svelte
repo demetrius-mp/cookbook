@@ -1,6 +1,6 @@
 <script lang="ts" context="module">
 	export const load: Load = async ({ fetch }) => {
-		const items = trpcClient(fetch).query('items:list');
+		const items = await trpcClient(fetch).query('items:list');
 
 		return {
 			props: {

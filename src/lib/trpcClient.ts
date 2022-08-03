@@ -1,5 +1,5 @@
 import { browser } from '$app/env';
-import type { Router } from '$lib/trpcServer';
+import type { Router } from '$lib/server/trpc';
 import type { LoadEvent } from '@sveltejs/kit';
 import * as trpc from '@trpc/client';
 import type { inferProcedureInput, inferProcedureOutput } from '@trpc/server';

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { session } from '$app/stores';
 	import { setTheme } from '$lib/stores/theme.store';
-	import { themes } from '$lib/types';
+	import { themes } from '$lib/utils/theme.util';
 </script>
 
 <div title="Change Theme" class="dropdown dropdown-end">

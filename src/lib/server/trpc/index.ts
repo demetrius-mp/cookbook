@@ -1,8 +1,8 @@
 import type { inferAsyncReturnType } from '@trpc/server';
 import trpcTransformer from 'trpc-transformer';
 import * as trpc from '@trpc/server';
-import itemRouter from '$lib/trpcServer/item';
-import recipeRouter from '$lib/trpcServer/recipe';
+import itemRouter from './item';
+import recipeRouter from './recipe';
 
 export const createContext = async () => ({});
 

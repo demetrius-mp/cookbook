@@ -1,4 +1,4 @@
-import prisma from '$lib/prisma';
+import prisma from '$lib/server/prisma';
 import * as trpc from '@trpc/server';
 import { z } from 'zod';
 

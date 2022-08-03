@@ -1,6 +1,6 @@
-import { createContext, router } from '$lib/trpcServer';
+import { createContext, router } from '$lib/server/trpc';
 import { createTRPCHandle } from 'trpc-sveltekit';
-import { getThemeFromCookies } from '$lib/getThemeFromCookies';
+import { getThemeFromCookies } from '$lib/utils/theme.util';
 import type { GetSession, Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 

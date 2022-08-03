@@ -1,6 +1,6 @@
 import { browser } from '$app/env';
 import { session } from '$app/stores';
-import type { Theme } from '$lib/types';
+import type { Theme } from '$lib/utils/theme.util';
 import type { Writable } from 'svelte/store';
 import { derived } from 'svelte/store';
 
