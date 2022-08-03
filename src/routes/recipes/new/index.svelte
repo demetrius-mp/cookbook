@@ -42,7 +42,7 @@
 	function newItem(): InferMutationInput<'recipes:save'>['items'][number] {
 		return {
 			amount: 0,
-			id: ''
+			id: items.length > 0 ? items[0].id : ''
 		};
 	}
 
@@ -59,6 +59,8 @@
 			removeAfter: 2000
 		});
 	}
+
+	$: console.log(recipe);
 </script>
 
 <form
