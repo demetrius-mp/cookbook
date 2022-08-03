@@ -1,5 +1,6 @@
 <script lang="ts">
 	import toastStore from '$lib/components/Toast/toast.store';
+	import { createItem } from '$lib/repositories/item.repository';
 	import type { Prisma } from '@prisma/client';
 	import { createForm } from 'svelte-forms-lib';
 
@@ -11,10 +12,7 @@
 			price: 0
 		},
 		onSubmit: async (values) => {
-			await fetch('/items.json', {
-				method: 'POST',
-				body: JSON.stringify(values)
-			});
+			await createItem({ item: values });
 
 			toastStore.push({
 				kind: 'success',

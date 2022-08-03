@@ -1,7 +1,14 @@
 <script lang="ts" context="module">
 	export const load: Load = async ({ fetch }) => {
-		const r = await fetch('/items.json');
-		const items = (await r.json()) as Item[];
+		// const r = await fetch('/items.json', {
+		// 	headers: {
+		// 		Accept: 'application/json'
+		// 	}
+		// });
+
+		// const items = (await r.json()) as Item[];
+
+		const items = await loadItems({ fetch });
 
 		return {
 			props: {
@@ -14,6 +21,7 @@
 <script lang="ts">
 	import Autocomplete from '$lib/components/Autocomplete/Autocomplete.svelte';
 	import toastStore from '$lib/components/Toast/toast.store';
+	import { loadItems } from '$lib/repositories/item.repository';
 	import type { Item } from '@prisma/client';
 	import type { Load } from '@sveltejs/kit';
 

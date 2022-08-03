@@ -2,6 +2,7 @@ import prisma from '$lib/prisma';
 import type { Prisma } from '@prisma/client';
 import type { RequestHandler } from '@sveltejs/kit';
 
+// create item
 export const POST: RequestHandler = async ({ request }) => {
 	const body = (await request.json()) as Prisma.ItemCreateInput;
 
@@ -14,15 +15,18 @@ export const POST: RequestHandler = async ({ request }) => {
 	};
 };
 
+// get all items
 export const GET: RequestHandler = async () => {
 	const items = await prisma.item.findMany({
-		select: prisma.$exclude('item', ['createdAt', 'updatedAt']),
 		orderBy: {
 			name: 'asc'
 		}
 	});
 
 	return {
-		body: items
+		body: items,
+		headers: {
+			'Content-Type': 'application/json'
+		}
 	};
 };

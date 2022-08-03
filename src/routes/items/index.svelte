@@ -1,7 +1,6 @@
 <script lang="ts" context="module">
 	export const load: Load = async ({ fetch }) => {
-		const r = await fetch('/items.json');
-		const items = (await r.json()) as Item[];
+		const items = await loadItems({ fetch });
 
 		return {
 			props: {
@@ -15,20 +14,17 @@
 	import toastStore from '$lib/components/Toast/toast.store';
 
 	import { formatCurrency } from '$lib/formatter';
+	import { deleteItem, loadItems } from '$lib/repositories/item.repository';
 	import type { Item } from '@prisma/client';
 	import type { Load } from '@sveltejs/kit';
 
 	export let items: Item[];
 
-	async function deleteItem(id: string) {
-		if (!confirm('Are you sure you want to delete this item?')) return;
+	async function handleDeleteItem(id: string) {
+		const confirmDelete = confirm('Are you sure you want to delete this item?');
+		if (!confirmDelete) return;
 
-		await fetch(`/items/${id}`, {
-			method: 'DELETE',
-			headers: {
-				Accept: 'application/json'
-			}
-		});
+		await deleteItem({ id });
 
 		toastStore.push({
 			kind: 'success',
@@ -36,8 +32,7 @@
 			removeAfter: 2000
 		});
 
-		const r = await fetch('/items.json');
-		items = (await r.json()) as Item[];
+		items = await loadItems({});
 	}
 </script>
 
@@ -78,7 +73,7 @@
 						</div>
 					</td>
 					<td class="w-0">
-						<button on:click={() => deleteItem(item.id)} class="btn btn-sm">
+						<button on:click={() => handleDeleteItem(item.id)} class="btn btn-sm">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								class="h-6 w-6"
