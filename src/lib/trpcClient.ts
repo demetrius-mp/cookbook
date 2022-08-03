@@ -1,16 +1,17 @@
 import { browser } from '$app/env';
 import type { Router } from '$lib/trpcServer';
+import type { LoadEvent } from '@sveltejs/kit';
 import * as trpc from '@trpc/client';
 import type { inferProcedureInput, inferProcedureOutput } from '@trpc/server';
 import trpcTransformer from 'trpc-transformer';
 
 const url = browser ? '/trpc' : 'http://127.0.0.1:5173/trpc';
 
-const trpcClient = (loadFetch?: typeof fetch) =>
+const trpcClient = (loadFetch?: LoadEvent['fetch']) =>
 	trpc.createTRPCClient<Router>({
 		url: loadFetch ? '/trpc' : url,
 		transformer: trpcTransformer,
-		...(loadFetch && { fetch: loadFetch })
+		...(loadFetch && { fetch: loadFetch as typeof fetch })
 	});
 
 export default trpcClient;
