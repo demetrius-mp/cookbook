@@ -1,10 +1,11 @@
 <script lang="ts">
 	import toastStore from '$lib/components/Toast/toast.store';
-	import { createItem } from '$lib/repositories/item.repository';
-	import type { Prisma } from '@prisma/client';
+	import trpcClient, { type InferMutationInput } from '$lib/trpcClient';
 	import { createForm } from 'svelte-forms-lib';
 
-	const { handleSubmit, form, isSubmitting } = createForm<Prisma.ItemCreateInput>({
+	type CreateItem = InferMutationInput<'items:save'>;
+
+	const { handleSubmit, form, isSubmitting } = createForm<CreateItem>({
 		initialValues: {
 			amountKind: '',
 			baseAmount: 0,
@@ -12,7 +13,7 @@
 			price: 0
 		},
 		onSubmit: async (values) => {
-			await createItem({ item: values });
+			await trpcClient().mutation('items:save', values);
 
 			toastStore.push({
 				kind: 'success',

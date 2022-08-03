@@ -1,6 +1,6 @@
 <script lang="ts" context="module">
 	export const load: Load = async ({ fetch }) => {
-		const items = await loadItems({ fetch });
+		const items = await trpcClient(fetch).query('items:list');
 
 		return {
 			props: {
@@ -14,7 +14,7 @@
 	import toastStore from '$lib/components/Toast/toast.store';
 
 	import { formatCurrency } from '$lib/formatter';
-	import { deleteItem, loadItems } from '$lib/repositories/item.repository';
+	import trpcClient from '$lib/trpcClient';
 	import type { Item } from '@prisma/client';
 	import type { Load } from '@sveltejs/kit';
 
@@ -24,7 +24,7 @@
 		const confirmDelete = confirm('Are you sure you want to delete this item?');
 		if (!confirmDelete) return;
 
-		await deleteItem({ id });
+		await trpcClient().mutation('items:delete', id);
 
 		toastStore.push({
 			kind: 'success',
@@ -32,7 +32,7 @@
 			removeAfter: 2000
 		});
 
-		items = await loadItems({});
+		items = await trpcClient().query('items:list');
 	}
 </script>
 
