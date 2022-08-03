@@ -1,6 +1,6 @@
 <script lang="ts" context="module">
 	export const load: Load = async ({ fetch }) => {
-		const recipes = await loadRecipes({ fetch });
+		const recipes = await trpcClient(fetch).query('recipes:list');
 
 		return {
 			props: {
@@ -13,11 +13,10 @@
 <script lang="ts">
 	import { formatCurrency } from '$lib/formatter';
 	import type { Load } from '@sveltejs/kit';
-	import type { ApiRecipeOutput as Recipe } from 'src/routes/api/recipes';
-	import { deleteRecipe, loadRecipes } from '$lib/repositories/recipe.repository';
 	import toastStore from '$lib/components/Toast/toast.store';
+	import trpcClient, { type InferQueryOutput } from '$lib/trpcClient';
 
-	export let recipes: Recipe[];
+	export let recipes: InferQueryOutput<'recipes:list'>;
 
 	$: computedRecipes = recipes.map((recipe) => {
 		const recipeItems = recipe.items.map((item) => {
@@ -38,7 +37,7 @@
 		const confirmDelete = confirm('Are you sure you want to delete this item?');
 		if (!confirmDelete) return;
 
-		await deleteRecipe({ id });
+		await trpcClient().mutation('recipes:delete', id);
 
 		toastStore.push({
 			kind: 'success',
@@ -46,7 +45,7 @@
 			removeAfter: 2000
 		});
 
-		recipes = await loadRecipes({});
+		recipes = await trpcClient().query('recipes:list');
 	}
 </script>
 

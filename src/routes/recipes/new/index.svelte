@@ -1,6 +1,6 @@
 <script lang="ts" context="module">
 	export const load: Load = async ({ fetch }) => {
-		const items = await loadItems({ fetch });
+		const items = trpcClient(fetch).query('items:list');
 
 		return {
 			props: {
@@ -13,20 +13,15 @@
 <script lang="ts">
 	import Autocomplete from '$lib/components/Autocomplete/Autocomplete.svelte';
 	import toastStore from '$lib/components/Toast/toast.store';
-	import { loadItems } from '$lib/repositories/item.repository';
-	import { createRecipe } from '$lib/repositories/recipe.repository';
-	import type { Item } from '@prisma/client';
+	import trpcClient, { type InferMutationInput, type InferQueryOutput } from '$lib/trpcClient';
 	import type { Load } from '@sveltejs/kit';
-	import type { ApiRecipeCreateInput } from 'src/routes/api/recipes';
 
-	export let items: Item[];
+	export let items: InferQueryOutput<'items:list'>;
 
-	let recipe: ApiRecipeCreateInput = {
-		items: [],
+	let recipe: InferMutationInput<'recipes:save'> = {
+		items: [newItem()],
 		name: ''
 	};
-
-	addItem();
 
 	function removeItem(index: number) {
 		if (recipe.items.length === 1) {
@@ -42,20 +37,19 @@
 		recipe.items = recipe.items.filter((_, i) => i !== index);
 	}
 
+	function newItem(): InferMutationInput<'recipes:save'>['items'][number] {
+		return {
+			amount: 0,
+			id: ''
+		};
+	}
+
 	function addItem() {
-		recipe.items = [
-			...recipe.items,
-			{
-				id: items[0].id,
-				amount: 0
-			}
-		];
+		recipe.items = [...recipe.items, newItem()];
 	}
 
 	async function handleSubmit() {
-		await createRecipe({
-			recipe
-		});
+		await trpcClient().mutation('recipes:save', recipe);
 
 		toastStore.push({
 			kind: 'success',
