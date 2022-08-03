@@ -6,7 +6,7 @@
 	export let options: T[];
 	export let labelKey: keyof T;
 	export let idKey: keyof T;
-	export let selectedId = options[0][idKey];
+	export let selectedId = options[0][idKey] || '';
 
 	let isFocused = false;
 	const setFocus = () => (isFocused = true);
@@ -39,9 +39,11 @@
 
 	const dispatch = createEventDispatcher<{
 		select: T;
+		emptyOptionsAction: void;
 	}>();
 
-	$: dispatch('select', options[index]);
+	$: currentOption = options[index];
+	$: dispatch('select', currentOption);
 </script>
 
 <div class="relative inline-block w-full">
@@ -50,7 +52,7 @@
 		on:focus={setFocus}
 		on:keydown={handleKeydown}
 		on:blur={removeFocus}
-		value={options[index][labelKey]}
+		value={currentOption ? currentOption[labelKey] : ''}
 		required
 		name="itemName"
 		type="text"
@@ -70,6 +72,15 @@
 							class:active={index === i}
 						>
 							{option[labelKey]}
+						</button>
+					</li>
+				{:else}
+					<li>
+						<button
+							type="button"
+							on:mousedown|preventDefault={() => dispatch('emptyOptionsAction')}
+						>
+							<slot name="empty options" />
 						</button>
 					</li>
 				{/each}

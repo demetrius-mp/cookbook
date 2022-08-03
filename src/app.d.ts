@@ -4,13 +4,13 @@
 // and what to do when importing types
 declare namespace App {
 	interface Locals {
-		theme: import('./types').Theme;
+		theme: import('./lib/utils/theme.util').Theme;
 	}
 	// interface Platform {}
 	// interface PrivateEnv {}
 	// interface PublicEnv {}
 	interface Session {
-		theme: import('./lib/types').Theme;
+		theme: import('./lib/utils/theme.util').Theme;
 	}
 	// interface Stuff {}
 }

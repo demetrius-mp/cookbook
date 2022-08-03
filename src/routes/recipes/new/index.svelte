@@ -11,6 +11,8 @@
 </script>
 
 <script lang="ts">
+	import { goto } from '$app/navigation';
+
 	import Autocomplete from '$lib/components/Autocomplete/Autocomplete.svelte';
 	import toastStore from '$lib/components/Toast/toast.store';
 	import trpcClient, { type InferMutationInput, type InferQueryOutput } from '$lib/trpcClient';
@@ -109,8 +111,13 @@
 							labelKey={'name'}
 							selectedId={recipeItem.id}
 							idKey={'id'}
+							on:emptyOptionsAction={() => goto('/items/new')}
 							on:select={(e) => (recipeItem.id = e.detail.id)}
-						/>
+						>
+							<svelte:fragment slot="empty options">
+								You don't have any items. Click here to create a new item.
+							</svelte:fragment>
+						</Autocomplete>
 					</div>
 				</div>
 				<div class="form-control w-full">
