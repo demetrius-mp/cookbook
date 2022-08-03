@@ -1,13 +1,5 @@
 <script lang="ts" context="module">
 	export const load: Load = async ({ fetch }) => {
-		// const r = await fetch('/items.json', {
-		// 	headers: {
-		// 		Accept: 'application/json'
-		// 	}
-		// });
-
-		// const items = (await r.json()) as Item[];
-
 		const items = await loadItems({ fetch });
 
 		return {
@@ -24,26 +16,16 @@
 	import { loadItems } from '$lib/repositories/item.repository';
 	import type { Item } from '@prisma/client';
 	import type { Load } from '@sveltejs/kit';
+	import type { CustomRecipeCreateInput } from 'src/routes/api/recipes';
 
 	export let items: Item[];
 
-	interface FormProps {
-		name: string;
-		items: {
-			id: string;
-			amount: number;
-		}[];
-	}
-
-	let recipe: FormProps = {
-		items: [
-			{
-				id: '',
-				amount: 0
-			}
-		],
+	let recipe: CustomRecipeCreateInput = {
+		items: [],
 		name: ''
 	};
+
+	addItem();
 
 	function removeItem(index: number) {
 		if (recipe.items.length === 1) {
@@ -63,14 +45,23 @@
 		recipe.items = [
 			...recipe.items,
 			{
-				id: '',
+				id: items[0].id,
 				amount: 0
 			}
 		];
 	}
 
 	async function handleSubmit() {
-		alert(JSON.stringify(recipe));
+		await fetch('/api/recipes', {
+			method: 'POST',
+			body: JSON.stringify(recipe)
+		});
+
+		toastStore.push({
+			kind: 'success',
+			message: 'Recipe created successfully!',
+			removeAfter: 2000
+		});
 	}
 </script>
 

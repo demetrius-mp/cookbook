@@ -13,37 +13,29 @@ datasource db {
 model Item {
   id String @id @default(uuid())
 
-  name        String
-  baseAmount  Float
-  amountKind  String
-  price       Float
-  recipeItems RecipeItem[]
+  name       String
+  baseAmount Float
+  amountKind String
+  price      Float
+  recipes    ItemsOnRecipes[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model RecipeItem {
+model ItemsOnRecipes {
   id String @id @default(uuid())
 
-  itemId String
+  recipe   Recipe @relation(fields: [recipeId], references: [id])
+  recipeId String
+
   item   Item   @relation(fields: [itemId], references: [id])
+  itemId String
 
-  recipes RecipeItemsOnRecipes[]
-
-  amount Float
+  amount Int
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-}
-
-model RecipeItemsOnRecipes {
-  recipe       Recipe     @relation(fields: [recipeId], references: [id])
-  recipeId     String
-  recipeItem   RecipeItem @relation(fields: [recipeItemId], references: [id])
-  recipeItemId String
-
-  @@id([recipeId, recipeItemId])
 }
 
 model Recipe {
@@ -51,7 +43,7 @@ model Recipe {
 
   name String
 
-  recipeItems RecipeItemsOnRecipes[]
+  items ItemsOnRecipes[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
