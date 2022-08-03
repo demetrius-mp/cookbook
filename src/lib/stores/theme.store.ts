@@ -14,5 +14,5 @@ export const theme = derived<Writable<App.Session>, Theme>(session, ($session, s
 
 export const setTheme = (theme: Theme) => {
 	session.update(($session) => ({ ...$session, theme }));
-	fetch('/theme', { method: 'PUT', body: theme });
+	fetch('/cookies/theme', { method: 'PUT', body: theme });
 };
