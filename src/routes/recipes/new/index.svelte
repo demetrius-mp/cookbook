@@ -13,31 +13,32 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 
-	import Autocomplete from '$lib/components/Autocomplete/Autocomplete.svelte';
 	import toastStore from '$lib/components/Toast/toast.store';
 	import trpcClient, { type InferMutationInput, type InferQueryOutput } from '$lib/trpcClient';
 	import type { Load } from '@sveltejs/kit';
+	import { createForm } from 'svelte-forms-lib';
 
 	export let items: InferQueryOutput<'items:list'>;
 
-	let recipe: InferMutationInput<'recipes:save'> = {
-		items: [newItem()],
-		name: ''
-	};
+	type CreateRecipeForm = InferMutationInput<'recipes:save'>;
 
-	function removeItem(index: number) {
-		if (recipe.items.length === 1) {
+	const { form, handleSubmit, handleReset, isSubmitting } = createForm<CreateRecipeForm>({
+		initialValues: {
+			name: '',
+			items: [newItem()]
+		},
+		onSubmit: async (values) => {
+			await trpcClient().mutation('recipes:save', values);
+
 			toastStore.push({
-				kind: 'error',
-				message: 'You must keep at least 1 item.',
-				removeAfter: 3000
+				kind: 'success',
+				message: 'Recipe created successfully!',
+				removeAfter: 2000
 			});
 
-			return;
+			handleReset();
 		}
-
-		recipe.items = recipe.items.filter((_, i) => i !== index);
-	}
+	});
 
 	function newItem(): InferMutationInput<'recipes:save'>['items'][number] {
 		return {
@@ -47,20 +48,22 @@
 	}
 
 	function addItem() {
-		recipe.items = [...recipe.items, newItem()];
+		$form.items = [...$form.items, newItem()];
 	}
 
-	async function handleSubmit() {
-		await trpcClient().mutation('recipes:save', recipe);
+	function removeItem(index: number) {
+		if ($form.items.length === 1) {
+			toastStore.push({
+				kind: 'error',
+				message: 'You must keep at least 1 item.',
+				removeAfter: 3000
+			});
 
-		toastStore.push({
-			kind: 'success',
-			message: 'Recipe created successfully!',
-			removeAfter: 2000
-		});
+			return;
+		}
+
+		$form.items = $form.items.filter((_, i) => i !== index);
 	}
-
-	$: console.log(recipe);
 </script>
 
 <form
@@ -73,7 +76,7 @@
 			<span class="label-text">Recipe name</span>
 		</label>
 		<input
-			bind:value={recipe.name}
+			bind:value={$form.name}
 			required
 			name="recipeName"
 			type="text"
@@ -83,7 +86,7 @@
 	<div class="divider" />
 	<div class="card bg-base-200 w-full shadow-xl mb-4">
 		<div class="card-body p-5">
-			{#each recipe.items as recipeItem, i}
+			{#each $form.items as recipeItem, i}
 				<div class="flex justify-between">
 					<h2 class="card-title">Item {i + 1}</h2>
 					<button type="button" on:click={() => removeItem(i)} class="btn btn-square btn-sm">
@@ -106,21 +109,23 @@
 				<div class="form-control w-full">
 					<label for="itemName" class="label">
 						<span class="label-text">Item name</span>
+						<span class="label-text-alt text-sm">
+							<a class="link" href="/items/new">Create a new item</a>
+						</span>
 					</label>
-					<div>
-						<Autocomplete
-							options={items}
-							labelKey={'name'}
-							selectedId={recipeItem.id}
-							idKey={'id'}
-							on:emptyOptionsAction={() => goto('/items/new')}
-							on:select={(e) => (recipeItem.id = e.detail.id)}
+					{#if items.length === 0}
+						<button
+							type="button"
+							on:click={() => goto('/items/new')}
+							class="btn btn-outline btn-ghost justify-start">Create a new item</button
 						>
-							<svelte:fragment slot="empty options">
-								You don't have any items. Click here to create a new item.
-							</svelte:fragment>
-						</Autocomplete>
-					</div>
+					{:else}
+						<select required bind:value={recipeItem.id} class="select select-bordered">
+							{#each items as item, i}
+								<option value={item.id} selected={i === 0}>{item.name}</option>
+							{/each}
+						</select>
+					{/if}
 				</div>
 				<div class="form-control w-full">
 					<label for="amount" class="label">
@@ -144,5 +149,7 @@
 
 	<div class="divider" />
 
-	<button type="submit" class="btn btn-outline btn-secondary w-full">Create recipe</button>
+	<button type="submit" class:loading={$isSubmitting} class="btn btn-outline btn-secondary w-full">
+		Create recipe
+	</button>
 </form>
