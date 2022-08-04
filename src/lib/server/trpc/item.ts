@@ -4,6 +4,16 @@ import { z } from 'zod';
 
 const itemRouter = trpc
 	.router()
+	.query('findById', {
+		input: z.string(),
+		resolve: ({ input }) => {
+			return prisma.item.findUnique({
+				where: {
+					id: input
+				}
+			});
+		}
+	})
 	.query('list', {
 		resolve: () => {
 			return prisma.item.findMany({
