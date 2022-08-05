@@ -11,6 +11,8 @@
 </script>
 
 <script lang="ts">
+	import { goto } from '$app/navigation';
+
 	import RecipeForm from '$lib/components/RecipeForm/RecipeForm.svelte';
 	import trpcClient, { type InferQueryOutput } from '$lib/trpcClient';
 	import type { Load } from '@sveltejs/kit';
@@ -19,4 +21,4 @@
 </script>
 
 <h3 class="text-4xl font-bold text-center">Add new recipe</h3>
-<RecipeForm {items} />
+<RecipeForm on:submit={() => goto('/recipes')} {items} />

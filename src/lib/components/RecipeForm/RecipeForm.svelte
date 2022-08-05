@@ -148,6 +148,7 @@
 						required
 						name="amount"
 						type="number"
+						min="1"
 						class="input input-bordered w-full"
 					/>
 				</div>

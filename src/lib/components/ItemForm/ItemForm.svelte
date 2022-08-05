@@ -59,6 +59,8 @@
 			required
 			name="baseAmount"
 			type="number"
+			min="0.01"
+			step="0.01"
 			class="input input-bordered w-full"
 		/>
 	</div>
@@ -85,6 +87,8 @@
 			required
 			name="price"
 			type="number"
+			min="0.01"
+			step="0.01"
 			class="input input-bordered w-full"
 		/>
 	</div>
