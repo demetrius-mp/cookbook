@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import InputWrapper from '$lib/components/FormHelpers/InputWrapper.svelte';
+	import InputError from '$lib/components/InputError/InputError.svelte';
 
 	import toastStore from '$lib/components/Toast/toast.store';
 	import trpcClient, { type InferMutationInput, type InferQueryOutput } from '$lib/trpcClient';
@@ -19,7 +19,7 @@
 	};
 
 	type SaveItemErrors = ZodFormattedError<SaveRecipe>;
-	let errors: SaveItemErrors;
+	let errors: SaveItemErrors | undefined;
 
 	const dispatch = createEventDispatcher<{
 		submit: void;
@@ -38,6 +38,7 @@
 				});
 
 				handleReset();
+				errors = undefined;
 
 				dispatch('submit');
 			} catch (e) {
@@ -91,16 +92,18 @@
 	class="flex flex-col gap-3 items-center justify-center"
 >
 	<div class="form-control w-full">
-		<InputWrapper let:hasError {errors} key={'name'}>
-			<input
-				bind:value={$form.name}
-				required
-				name="recipeName"
-				type="text"
-				class="input input-bordered w-full"
-				class:input-error={hasError}
-			/>
-		</InputWrapper>
+		<label for="recipeName" class="label">
+			<span class="label-text">Name</span>
+		</label>
+		<input
+			bind:value={$form.name}
+			required
+			name="recipeName"
+			type="text"
+			class="input input-bordered w-full"
+			class:input-error={errors?.name?._errors}
+		/>
+		<InputError errors={errors?.name?._errors} />
 	</div>
 	<div class="divider" />
 	<div class="card bg-base-200 w-full shadow-xl mb-4">
@@ -152,22 +155,19 @@
 					{/if}
 				</div>
 				<div class="form-control w-full">
-					<InputWrapper
-						let:hasError
-						errors={errors && errors.items && errors.items[i]}
-						key={'amount'}
-						label="Amount"
-					>
-						<input
-							bind:value={recipeItem.amount}
-							required
-							name="amount"
-							type="number"
-							min="1"
-							class="input input-bordered w-full"
-							class:input-error={hasError}
-						/>
-					</InputWrapper>
+					<label for="items[{i}].name" class="label">
+						<span class="label-text">Item name</span>
+					</label>
+					<input
+						bind:value={recipeItem.amount}
+						required
+						name="amount"
+						type="number"
+						min="1"
+						class="input input-bordered w-full"
+						class:input-error={errors?.items?.[i]?.amount?._errors}
+					/>
+					<InputError errors={errors?.items?.[i]?.amount?._errors} />
 				</div>
 				<div class="divider" />
 			{/each}

@@ -4,7 +4,7 @@
 	import { createForm } from 'svelte-forms-lib';
 	import { createEventDispatcher } from 'svelte';
 	import { TRPCClientError } from '@trpc/client';
-	import InputWrapper from '$lib/components/FormHelpers/InputWrapper.svelte';
+	import InputError from '$lib/components/InputError/InputError.svelte';
 	import type { ZodFormattedError } from 'zod';
 
 	const dispatch = createEventDispatcher<{
@@ -21,7 +21,7 @@
 		price: 0
 	};
 
-	let errors: SaveItemError;
+	let errors: SaveItemError | undefined;
 
 	const { handleSubmit, form, isSubmitting } = createForm<SaveItem>({
 		initialValues: item,
@@ -34,6 +34,8 @@
 					message: 'Item saved successfully!',
 					removeAfter: 2000
 				});
+
+				errors = undefined;
 
 				dispatch('submit');
 			} catch (e) {
@@ -51,61 +53,67 @@
 >
 	<div class="form-control w-full">
 		<label for="name" class="label">
-			<span class="label-text">Recipe name</span>
+			<span class="label-text">Name</span>
 		</label>
-		<InputWrapper let:hasError {errors} key={'name'}>
-			<input
-				bind:value={$form.name}
-				required
-				name="name"
-				type="text"
-				class="input input-bordered w-full"
-				class:input-error={hasError}
-			/>
-		</InputWrapper>
+		<input
+			bind:value={$form.name}
+			required
+			name="name"
+			type="text"
+			min="3"
+			class="input input-bordered w-full"
+			class:input-error={errors?.name?._errors}
+		/>
+		<InputError errors={errors?.name?._errors} />
 	</div>
 
 	<div class="form-control w-full">
-		<InputWrapper let:hasError {errors} key={'baseAmount'}>
-			<input
-				bind:value={$form.baseAmount}
-				required
-				name="baseAmount"
-				type="number"
-				min="1"
-				step="1"
-				class="input input-bordered w-full"
-				class:input-error={hasError}
-			/>
-		</InputWrapper>
+		<label for="baseAmount" class="label">
+			<span class="label-text">Base amount</span>
+		</label>
+		<input
+			bind:value={$form.baseAmount}
+			required
+			name="baseAmount"
+			type="number"
+			min="1"
+			step="1"
+			class="input input-bordered w-full"
+			class:input-error={errors?.baseAmount?._errors}
+		/>
+		<InputError errors={errors?.baseAmount?._errors} />
 	</div>
 
 	<div class="form-control w-full">
-		<InputWrapper let:hasError {errors} key={'amountKind'}>
-			<input
-				bind:value={$form.amountKind}
-				required
-				name="amountKind"
-				type="text"
-				class="input input-bordered w-full"
-				class:input-error={hasError}
-			/>
-		</InputWrapper>
+		<label for="amountKind" class="label">
+			<span class="label-text">Amount kind</span>
+		</label>
+		<input
+			bind:value={$form.amountKind}
+			required
+			name="amountKind"
+			type="text"
+			class="input input-bordered w-full"
+			class:input-error={errors?.amountKind?._errors}
+		/>
+		<InputError errors={errors?.amountKind?._errors} />
 	</div>
 
 	<div class="form-control w-full">
-		<InputWrapper let:hasError {errors} key={'price'}>
-			<input
-				bind:value={$form.price}
-				required
-				name="price"
-				type="number"
-				min="0.01"
-				step="0.01"
-				class="input input-bordered w-full"
-				class:input-error={hasError}
-			/>
-		</InputWrapper>
+		<label for="price" class="label">
+			<span class="label-text">Price</span>
+		</label>
+		<input
+			bind:value={$form.price}
+			required
+			name="price"
+			type="number"
+			min="0.01"
+			step="0.01"
+			class="input input-bordered w-full"
+			class:input-error={errors?.price?._errors}
+		/>
+		<InputError errors={errors?.price?._errors} />
 	</div>
 
 	<button type="submit" class:loading={$isSubmitting} class="btn btn-outline btn-secondary w-full">
