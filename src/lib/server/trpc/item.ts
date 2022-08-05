@@ -5,9 +5,9 @@ import { z } from 'zod';
 const itemRouter = trpc
 	.router()
 	.query('findById', {
-		input: z.string(),
-		resolve: ({ input }) => {
-			return prisma.item.findUnique({
+		input: z.string().uuid(),
+		resolve: async ({ input }) => {
+			return await prisma.item.findUnique({
 				where: {
 					id: input
 				}
@@ -15,8 +15,8 @@ const itemRouter = trpc
 		}
 	})
 	.query('list', {
-		resolve: () => {
-			return prisma.item.findMany({
+		resolve: async () => {
+			return await prisma.item.findMany({
 				orderBy: {
 					name: 'asc'
 				},
@@ -28,15 +28,15 @@ const itemRouter = trpc
 	})
 	.mutation('save', {
 		input: z.object({
-			id: z.string().optional(),
-			name: z.string(),
-			baseAmount: z.number().int(),
+			id: z.string().uuid().optional(),
+			name: z.string().min(3),
+			baseAmount: z.number().int().min(1),
 			amountKind: z.string(),
-			price: z.number()
+			price: z.number().min(0.01)
 		}),
-		resolve: ({ input: { id, ...data } }) => {
+		resolve: async ({ input: { id, ...data } }) => {
 			if (id) {
-				return prisma.item.update({
+				return await prisma.item.update({
 					data,
 					where: {
 						id
@@ -44,15 +44,15 @@ const itemRouter = trpc
 				});
 			}
 
-			return prisma.item.create({
+			return await prisma.item.create({
 				data
 			});
 		}
 	})
 	.mutation('delete', {
-		input: z.string(),
-		resolve: ({ input }) => {
-			return prisma.item.update({
+		input: z.string().uuid(),
+		resolve: async ({ input }) => {
+			await prisma.item.update({
 				where: {
 					id: input
 				},

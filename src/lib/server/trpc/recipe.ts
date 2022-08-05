@@ -7,9 +7,9 @@ import { z } from 'zod';
 const recipeRouter = trpc
 	.router()
 	.query('findById', {
-		input: z.string(),
-		resolve: ({ input }) => {
-			return prisma.recipe.findUnique({
+		input: z.string().uuid(),
+		resolve: async ({ input }) => {
+			return await prisma.recipe.findUnique({
 				where: {
 					id: input
 				},
@@ -20,8 +20,8 @@ const recipeRouter = trpc
 		}
 	})
 	.query('list', {
-		resolve: () => {
-			return prisma.recipe.findMany({
+		resolve: async () => {
+			return await prisma.recipe.findMany({
 				include: {
 					items: {
 						select: {
@@ -54,8 +54,8 @@ const recipeRouter = trpc
 			name: z.string(),
 			items: z.array(
 				z.object({
-					id: z.string(),
-					amount: z.number().int()
+					id: z.string().uuid(),
+					amount: z.number().positive()
 				})
 			)
 		}),
@@ -138,9 +138,9 @@ const recipeRouter = trpc
 		}
 	})
 	.mutation('delete', {
-		input: z.string(),
-		resolve: ({ input }) => {
-			return prisma.recipe.update({
+		input: z.string().uuid(),
+		resolve: async ({ input }) => {
+			await prisma.recipe.update({
 				where: {
 					id: input
 				},
