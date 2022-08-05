@@ -6,7 +6,8 @@
 	import { createEventDispatcher } from 'svelte';
 	import { createForm } from 'svelte-forms-lib';
 
-	export let items: InferQueryOutput<'items:list'>;
+	type Item = InferQueryOutput<'items:list'>[number];
+	export let items: Item[];
 
 	type SaveRecipe = InferMutationInput<'recipes:save'>;
 	export let recipe: SaveRecipe = {
@@ -59,6 +60,8 @@
 
 		$form.items = $form.items.filter((_, i) => i !== index);
 	}
+
+	$: addNewItemButtonIsDisabled = $form.items.length === items.length;
 </script>
 
 <form
@@ -115,7 +118,7 @@
 						>
 					{:else}
 						<select required bind:value={recipeItem.id} class="select select-bordered">
-							{#each items as item, i}
+							{#each items as item}
 								<option value={item.id}>{item.name}</option>
 							{/each}
 						</select>
@@ -135,7 +138,12 @@
 				</div>
 				<div class="divider" />
 			{/each}
-			<button type="button" on:click={addItem} class="btn btn-outline btn-accent w-full">
+			<button
+				disabled={addNewItemButtonIsDisabled}
+				type="button"
+				on:click={addItem}
+				class="btn btn-outline btn-accent w-full"
+			>
 				+ New item
 			</button>
 		</div>
