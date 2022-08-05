@@ -7,12 +7,12 @@
 	import { createForm } from 'svelte-forms-lib';
 
 	type Item = InferQueryOutput<'items:list'>[number];
-	export let items: Item[];
+	export let items: Item[] = [];
 
 	type SaveRecipe = InferMutationInput<'recipes:save'>;
 	export let recipe: SaveRecipe = {
 		name: '',
-		items: [newItem()]
+		items: [makeNewItem()]
 	};
 
 	const dispatch = createEventDispatcher<{
@@ -36,15 +36,25 @@
 		}
 	});
 
-	function newItem(): SaveRecipe['items'][number] {
+	function makeNewItem(): SaveRecipe['items'][number] {
+		const itemToUseId =
+			items.find((v) => {
+				return $form && !$form.items.some((item) => item.id === v.id);
+			}) || items[0];
+
 		return {
 			amount: 0,
-			id: items.length > 0 ? items[0].id : ''
+			id: itemToUseId.id
 		};
 	}
 
+	let addNewItemButtonIsDisabled = recipe.items.length === items.length;
 	function addItem() {
-		$form.items = [...$form.items, newItem()];
+		if ($form.items.length === items.length) {
+			return;
+		}
+
+		$form.items = [...$form.items, makeNewItem()];
 	}
 
 	function removeItem(index: number) {
@@ -119,7 +129,12 @@
 					{:else}
 						<select required bind:value={recipeItem.id} class="select select-bordered">
 							{#each items as item}
-								<option value={item.id}>{item.name}</option>
+								<option
+									hidden={$form.items.some((i) => i.id === item.id && i.id !== recipeItem.id)}
+									value={item.id}
+								>
+									{item.name}
+								</option>
 							{/each}
 						</select>
 					{/if}
