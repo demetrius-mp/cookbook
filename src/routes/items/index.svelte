@@ -61,7 +61,7 @@
 		</thead>
 
 		<tbody>
-			{#each items as item}
+			{#each items as item (item.id)}
 				<tr>
 					<td class="font-bold">
 						{item.name}

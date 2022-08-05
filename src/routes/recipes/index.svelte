@@ -16,6 +16,8 @@
 	import toastStore from '$lib/components/Toast/toast.store';
 	import trpcClient, { type InferQueryOutput } from '$lib/trpcClient';
 	import { goto } from '$app/navigation';
+	import { flip } from 'svelte/animate';
+	import { fade } from 'svelte/transition';
 
 	export let recipes: InferQueryOutput<'recipes:list'>;
 
@@ -53,7 +55,7 @@
 		await goto(`/recipes/${id}/edit`);
 	}
 
-	function removeFocusFromDropdown() {
+	function closeDropdown() {
 		(document.activeElement as HTMLElement).blur();
 	}
 </script>
@@ -69,8 +71,12 @@
 
 {#if computedRecipes.length > 0}
 	<ul class="grid sm:grid-cols-2 gap-6 md:grid-cols-3">
-		{#each computedRecipes as recipe}
-			<li class="col-span-1 flex flex-col rounded-lg">
+		{#each computedRecipes as recipe (recipe.id)}
+			<li
+				animate:flip={{ duration: 500 }}
+				transition:fade={{ duration: 300 }}
+				class="col-span-1 flex flex-col rounded-lg"
+			>
 				<div class="card bg-base-200 shadow-xl">
 					<div class="card-body p-5">
 						<div class="flex justify-between items-center gap-3">
@@ -93,7 +99,7 @@
 									</svg>
 								</label>
 								<ul
-									on:click={removeFocusFromDropdown}
+									on:click={closeDropdown}
 									tabindex="0"
 									class="dropdown-content menu p-2 shadow bg-base-100 rounded-box"
 								>
