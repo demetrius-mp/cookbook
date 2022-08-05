@@ -1,10 +1,24 @@
 import prisma from '$lib/server/prisma';
 import type { Prisma } from '@prisma/client';
 import * as trpc from '@trpc/server';
+import { differenceBy, intersectionWith, isEqual } from 'lodash-es';
 import { z } from 'zod';
 
 const recipeRouter = trpc
 	.router()
+	.query('findById', {
+		input: z.string(),
+		resolve: ({ input }) => {
+			return prisma.recipe.findUnique({
+				where: {
+					id: input
+				},
+				include: {
+					items: true
+				}
+			});
+		}
+	})
 	.query('list', {
 		resolve: () => {
 			return prisma.recipe.findMany({
@@ -45,7 +59,7 @@ const recipeRouter = trpc
 				})
 			)
 		}),
-		resolve: ({ input: { id, ...data } }) => {
+		resolve: async ({ input: { id, ...data } }) => {
 			const computedData:
 				| (Prisma.Without<Prisma.RecipeCreateInput, Prisma.RecipeUncheckedCreateInput> &
 						Prisma.RecipeUncheckedCreateInput)
@@ -67,15 +81,58 @@ const recipeRouter = trpc
 			};
 
 			if (id) {
-				return prisma.recipe.update({
-					data: computedData,
+				const recipe = await prisma.recipe.findUnique({
 					where: {
 						id
+					},
+					include: {
+						items: true
+					}
+				});
+
+				if (!recipe) {
+					throw new trpc.TRPCError({
+						code: 'BAD_REQUEST',
+						message: 'Recipe does not exist'
+					});
+				}
+
+				const existingItems: typeof data.items = recipe.items.map((item) => {
+					return {
+						id: item.itemId,
+						amount: item.amount
+					};
+				});
+
+				const itemsToCreate = differenceBy(data.items, existingItems, 'id');
+				const itemsToDelete = differenceBy(existingItems, data.items, 'id');
+				const itemsToUpdate = intersectionWith(data.items, existingItems, (a, b) => !isEqual(a, b));
+
+				return await prisma.recipe.update({
+					where: {
+						id
+					},
+					data: {
+						...data,
+						items: {
+							create: itemsToCreate.map(({ id, ...rest }) => ({
+								...rest,
+								item: { connect: { id } }
+							})),
+							deleteMany: itemsToDelete.map((item) => ({ itemId: item.id, recipeId: recipe.id })),
+							updateMany: itemsToUpdate.map(({ id, ...rest }) => ({
+								data: rest,
+								where: {
+									itemId: id,
+									recipeId: recipe.id
+								}
+							}))
+						}
 					}
 				});
 			}
 
-			return prisma.recipe.create({
+			return await prisma.recipe.create({
 				data: computedData
 			});
 		}

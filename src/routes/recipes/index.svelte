@@ -15,6 +15,7 @@
 	import type { Load } from '@sveltejs/kit';
 	import toastStore from '$lib/components/Toast/toast.store';
 	import trpcClient, { type InferQueryOutput } from '$lib/trpcClient';
+	import { goto } from '$app/navigation';
 
 	export let recipes: InferQueryOutput<'recipes:list'>;
 
@@ -46,6 +47,10 @@
 		});
 
 		recipes = await trpcClient().query('recipes:list');
+	}
+
+	async function handleEditRecipe(id: string) {
+		await goto(`/recipes/${id}/edit`);
 	}
 
 	function removeFocusFromDropdown() {
@@ -93,7 +98,7 @@
 									class="dropdown-content menu p-2 shadow bg-base-100 rounded-box"
 								>
 									<li>
-										<button class="text-info">
+										<button on:click={() => handleEditRecipe(recipe.id)} class="text-info">
 											<svg
 												xmlns="http://www.w3.org/2000/svg"
 												class="h-6 w-6"
