@@ -1,10 +1,13 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import InputWrapper from '$lib/components/FormHelpers/InputWrapper.svelte';
 
 	import toastStore from '$lib/components/Toast/toast.store';
 	import trpcClient, { type InferMutationInput, type InferQueryOutput } from '$lib/trpcClient';
+	import { TRPCClientError } from '@trpc/client';
 	import { createEventDispatcher } from 'svelte';
 	import { createForm } from 'svelte-forms-lib';
+	import type { ZodFormattedError } from 'zod';
 
 	type Item = InferQueryOutput<'items:list'>[number];
 	export let items: Item[] = [];
@@ -15,6 +18,9 @@
 		items: [makeNewItem()]
 	};
 
+	type SaveItemErrors = ZodFormattedError<SaveRecipe>;
+	let errors: SaveItemErrors;
+
 	const dispatch = createEventDispatcher<{
 		submit: void;
 	}>();
@@ -22,17 +28,23 @@
 	const { form, handleSubmit, handleReset, isSubmitting } = createForm<SaveRecipe>({
 		initialValues: recipe,
 		onSubmit: async (values) => {
-			await trpcClient().mutation('recipes:save', values);
+			try {
+				await trpcClient().mutation('recipes:save', values);
 
-			toastStore.push({
-				kind: 'success',
-				message: 'Recipe saved successfully!',
-				removeAfter: 2000
-			});
+				toastStore.push({
+					kind: 'success',
+					message: 'Recipe saved successfully!',
+					removeAfter: 2000
+				});
 
-			handleReset();
+				handleReset();
 
-			dispatch('submit');
+				dispatch('submit');
+			} catch (e) {
+				if (e instanceof TRPCClientError) {
+					errors = e.data.zodError;
+				}
+			}
 		}
 	});
 
@@ -72,6 +84,7 @@
 	}
 
 	$: addNewItemButtonIsDisabled = $form.items.length === items.length;
+	$: console.log(errors);
 </script>
 
 <form
@@ -79,16 +92,16 @@
 	class="flex flex-col gap-3 items-center justify-center"
 >
 	<div class="form-control w-full">
-		<label for="recipeName" class="label">
-			<span class="label-text">Recipe name</span>
-		</label>
-		<input
-			bind:value={$form.name}
-			required
-			name="recipeName"
-			type="text"
-			class="input input-bordered w-full"
-		/>
+		<InputWrapper let:hasError {errors} key={'name'}>
+			<input
+				bind:value={$form.name}
+				required
+				name="recipeName"
+				type="text"
+				class="input input-bordered w-full"
+				class:input-error={hasError}
+			/>
+		</InputWrapper>
 	</div>
 	<div class="divider" />
 	<div class="card bg-base-200 w-full shadow-xl mb-4">
@@ -140,17 +153,22 @@
 					{/if}
 				</div>
 				<div class="form-control w-full">
-					<label for="amount" class="label">
-						<span class="label-text">Amount</span>
-					</label>
-					<input
-						bind:value={recipeItem.amount}
-						required
-						name="amount"
-						type="number"
-						min="1"
-						class="input input-bordered w-full"
-					/>
+					<InputWrapper
+						let:hasError
+						errors={errors && errors.items && errors.items[i]}
+						key={'amount'}
+						label="Amount"
+					>
+						<input
+							bind:value={recipeItem.amount}
+							required
+							name="amount"
+							type="number"
+							min="1"
+							class="input input-bordered w-full"
+							class:input-error={hasError}
+						/>
+					</InputWrapper>
 				</div>
 				<div class="divider" />
 			{/each}

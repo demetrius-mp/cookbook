@@ -1,16 +1,19 @@
 <script lang="ts">
 	import InputError from './InputError.svelte';
-	import type { MappedZodError } from '$lib/utils/zod.util';
 	import { startCase } from 'lodash-es';
+	import type { ZodFormattedError } from 'zod';
 
 	type T = $$Generic;
-	type Errors = MappedZodError<T>;
+	type Errors = ZodFormattedError<T>;
 
 	export let errors: Errors | undefined = undefined;
-	export let key: keyof Errors;
+	export let key: keyof Omit<Errors, '_errors'>;
 	export let label = startCase(String(key));
 
-	$: hasError = errors !== undefined && errors[key] && errors[key]._errors.length > 0;
+	$: hasError =
+		errors !== undefined &&
+		errors[key] !== undefined &&
+		(errors[key] as { _errors: string[] })._errors.length > 0;
 </script>
 
 {#if $$slots.label || label}
@@ -23,6 +26,6 @@
 
 <slot {hasError} />
 
-{#if errors}
+{#if errors && hasError}
 	<InputError show={hasError} errors={errors[key]._errors} />
 {/if}

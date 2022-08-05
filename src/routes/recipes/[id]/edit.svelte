@@ -45,7 +45,7 @@
 	}
 </script>
 
-<h3 class="text-4xl font-bold text-center">Edit item</h3>
+<h3 class="text-4xl font-bold text-center">Edit recipe</h3>
 {#if dbRecipe}
 	<RecipeForm {items} {recipe} on:submit={() => goto('/recipes')} />
 {/if}

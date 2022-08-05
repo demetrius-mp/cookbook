@@ -51,11 +51,11 @@ const recipeRouter = trpc
 	.mutation('save', {
 		input: z.object({
 			id: z.string().optional(),
-			name: z.string(),
+			name: z.string().min(3),
 			items: z.array(
 				z.object({
 					id: z.string().uuid(),
-					amount: z.number().positive()
+					amount: z.number().min(3)
 				})
 			)
 		}),

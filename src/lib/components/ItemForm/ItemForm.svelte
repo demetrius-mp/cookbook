@@ -4,14 +4,15 @@
 	import { createForm } from 'svelte-forms-lib';
 	import { createEventDispatcher } from 'svelte';
 	import { TRPCClientError } from '@trpc/client';
-	import { makeMappedZodErrors } from '$lib/utils/zod.util';
 	import InputWrapper from '$lib/components/FormHelpers/InputWrapper.svelte';
+	import type { ZodFormattedError } from 'zod';
 
 	const dispatch = createEventDispatcher<{
 		submit: void;
 	}>();
 
 	type SaveItem = InferMutationInput<'items:save'>;
+	type SaveItemError = ZodFormattedError<SaveItem>;
 
 	export let item: SaveItem = {
 		amountKind: '',
@@ -20,7 +21,7 @@
 		price: 0
 	};
 
-	let errors = makeMappedZodErrors(item);
+	let errors: SaveItemError;
 
 	const { handleSubmit, form, isSubmitting } = createForm<SaveItem>({
 		initialValues: item,
@@ -34,16 +35,10 @@
 					removeAfter: 2000
 				});
 
-				errors = makeMappedZodErrors(item);
-
 				dispatch('submit');
 			} catch (e) {
 				if (e instanceof TRPCClientError) {
-					delete e.data.zodError._errors;
-					errors = {
-						...makeMappedZodErrors(item),
-						...e.data.zodError
-					};
+					errors = e.data.zodError;
 				}
 			}
 		}
