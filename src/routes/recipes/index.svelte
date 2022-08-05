@@ -74,7 +74,7 @@
 		{#each computedRecipes as recipe (recipe.id)}
 			<li
 				animate:flip={{ duration: 500 }}
-				transition:fade={{ duration: 300 }}
+				transition:fade|local={{ duration: 300 }}
 				class="col-span-1 flex flex-col rounded-lg"
 			>
 				<div class="card bg-base-200 shadow-xl">
