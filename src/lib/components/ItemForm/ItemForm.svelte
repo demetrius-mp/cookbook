@@ -50,6 +50,9 @@
 	class="flex flex-col gap-3 items-center justify-center"
 >
 	<div class="form-control w-full">
+		<label for="name" class="label">
+			<span class="label-text">Recipe name</span>
+		</label>
 		<InputWrapper let:hasError {errors} key={'name'}>
 			<input
 				bind:value={$form.name}

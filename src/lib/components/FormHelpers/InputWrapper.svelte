@@ -7,8 +7,9 @@
 	type Errors = ZodFormattedError<T>;
 
 	export let errors: Errors | undefined = undefined;
-	export let key: keyof Omit<Errors, '_errors'>;
-	export let label = startCase(String(key));
+	export let key: keyof Errors;
+	export let labelFor = String(key);
+	export let label = startCase(labelFor);
 
 	$: hasError =
 		errors !== undefined &&
@@ -18,7 +19,7 @@
 
 {#if $$slots.label || label}
 	<slot name="label">
-		<label for={String(key)} class="label">
+		<label for={labelFor} class="label">
 			<span class="label-text">{label}</span>
 		</label>
 	</slot>

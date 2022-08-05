@@ -84,7 +84,6 @@
 	}
 
 	$: addNewItemButtonIsDisabled = $form.items.length === items.length;
-	$: console.log(errors);
 </script>
 
 <form
