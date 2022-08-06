@@ -1,7 +1,16 @@
 <script lang="ts">
 	import { session } from '$app/stores';
-	import { setTheme } from '$lib/stores/theme.store';
-	import { themes } from '$lib/utils/theme.util';
+	import trpcClient from '$lib/trpcClient';
+	import { themes, type Theme } from '$lib/utils/theme.util';
+
+	async function handleSetTheme(theme: Theme) {
+		try {
+			await trpcClient().mutation('theme:save', theme);
+			$session.theme = theme;
+		} catch (e) {
+			console.error(e);
+		}
+	}
 </script>
 
 <div title="Change Theme" class="dropdown dropdown-end">
@@ -42,7 +51,7 @@
 					class:outline={$session.theme === theme}
 					data-set-theme={theme}
 					data-act-class="outline"
-					on:click={() => setTheme(theme)}
+					on:click={() => handleSetTheme(theme)}
 				>
 					<div
 						data-theme={theme}

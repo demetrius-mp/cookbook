@@ -6,6 +6,7 @@ import recipeRouter from './recipe';
 import userRouter from '$lib/server/trpc/user';
 import { ZodError } from 'zod';
 import type { RequestEvent } from '@sveltejs/kit';
+import themeRouter from '$lib/server/trpc/theme';
 
 export const createContext = async (event: RequestEvent) => {
 	const user = event.locals.user;
@@ -33,6 +34,7 @@ export const router = trpc
 		};
 	})
 	.transformer(trpcTransformer)
+	.merge('theme:', themeRouter)
 	.merge('users:', userRouter)
 	.merge('items:', itemRouter)
 	.merge('recipes:', recipeRouter);
