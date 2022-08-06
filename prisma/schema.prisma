@@ -15,6 +15,18 @@ enum STATE {
   ARCHIVED
 }
 
+model User {
+  id String @id @default(uuid())
+
+  name              String
+  email             String  @unique
+  password          String
+  profilePictureUrl String?
+
+  items   Item[]
+  recipes Recipe[]
+}
+
 model Item {
   id String @id @default(uuid())
 
@@ -22,12 +34,16 @@ model Item {
   baseAmount Float
   amountKind String
   price      Float
-  recipes    ItemsOnRecipes[]
 
   state STATE @default(VISIBLE)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  recipes ItemsOnRecipes[]
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
 }
 
 model ItemsOnRecipes {
@@ -48,11 +64,15 @@ model ItemsOnRecipes {
 model Recipe {
   id String @id @default(uuid())
 
-  name  String
-  items ItemsOnRecipes[]
+  name String
 
   state STATE @default(VISIBLE)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  items ItemsOnRecipes[]
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
 }

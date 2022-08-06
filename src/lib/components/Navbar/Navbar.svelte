@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { session } from '$app/stores';
+	import ProfileDropdown from '$lib/components/Navbar/ProfileDropdown.svelte';
 	import ThemeSelector from './ThemeSelector.svelte';
 </script>
 
@@ -23,7 +25,13 @@
 	<div class="flex-1 lg:hidden">
 		<a href="/" class="btn btn-ghost normal-case text-xl">cookbook</a>
 	</div>
-	<div>
+	<div class="flex gap-2">
 		<ThemeSelector />
+		{#if !$session.user}
+			<a class="btn btn-accent btn-outline" href="/sign-up">Sign up</a>
+			<a class="btn btn-secondary btn-outline" href="/sign-in">Sign in</a>
+		{:else}
+			<ProfileDropdown />
+		{/if}
 	</div>
 </div>

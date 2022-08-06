@@ -21,6 +21,7 @@
 	import IconTrash from '$lib/components/Icons/IconTrash.svelte';
 	import IconPencilAlt from '$lib/components/Icons/IconPencilAlt.svelte';
 	import IconDotsVertical from '$lib/components/Icons/IconDotsVertical.svelte';
+	import { session } from '$app/stores';
 
 	export let recipes: InferQueryOutput<'recipes:list'>;
 
