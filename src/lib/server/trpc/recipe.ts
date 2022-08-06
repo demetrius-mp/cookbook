@@ -1,26 +1,30 @@
 import prisma from '$lib/server/prisma';
+import { createProtectedRouter } from '$lib/server/trpc/utils';
+import { filterByUserId } from '$lib/server/trpc/utils';
 import type { Prisma } from '@prisma/client';
 import * as trpc from '@trpc/server';
 import { differenceBy, intersectionWith, isEqual } from 'lodash-es';
 import { z } from 'zod';
 
-const recipeRouter = trpc
-	.router()
+const recipeRouter = createProtectedRouter()
 	.query('findById', {
 		input: z.string().uuid(),
-		resolve: async ({ input }) => {
-			return await prisma.recipe.findUnique({
+		resolve: async ({ input, ctx }) => {
+			const recipe = await prisma.recipe.findFirst({
 				where: {
-					id: input
+					id: input,
+					...filterByUserId(ctx.user.id)
 				},
 				include: {
 					items: true
 				}
 			});
+
+			return recipe;
 		}
 	})
 	.query('list', {
-		resolve: async () => {
+		resolve: async ({ ctx }) => {
 			return await prisma.recipe.findMany({
 				include: {
 					items: {
@@ -43,7 +47,8 @@ const recipeRouter = trpc
 					name: 'asc'
 				},
 				where: {
-					state: 'VISIBLE'
+					state: 'VISIBLE',
+					...filterByUserId(ctx.user.id)
 				}
 			});
 		}
@@ -59,13 +64,14 @@ const recipeRouter = trpc
 				})
 			)
 		}),
-		resolve: async ({ input: { id, ...data } }) => {
+		resolve: async ({ input: { id, ...data }, ctx }) => {
 			const computedData:
 				| (Prisma.Without<Prisma.RecipeCreateInput, Prisma.RecipeUncheckedCreateInput> &
 						Prisma.RecipeUncheckedCreateInput)
 				| (Prisma.Without<Prisma.RecipeUncheckedCreateInput, Prisma.RecipeCreateInput> &
 						Prisma.RecipeCreateInput) = {
 				name: data.name,
+				userId: ctx.user.id,
 				items: {
 					create: data.items.map((item) => {
 						return {
@@ -83,7 +89,8 @@ const recipeRouter = trpc
 			if (id) {
 				const recipe = await prisma.recipe.findUnique({
 					where: {
-						id
+						id,
+						...filterByUserId(ctx.user.id)
 					},
 					include: {
 						items: true
@@ -93,7 +100,7 @@ const recipeRouter = trpc
 				if (!recipe) {
 					throw new trpc.TRPCError({
 						code: 'NOT_FOUND',
-						message: 'Recipe does not exist'
+						message: 'The recipe does not exist.'
 					});
 				}
 
@@ -110,7 +117,7 @@ const recipeRouter = trpc
 
 				return await prisma.recipe.update({
 					where: {
-						id
+						id: recipe.id
 					},
 					data: {
 						...data,
@@ -139,15 +146,23 @@ const recipeRouter = trpc
 	})
 	.mutation('delete', {
 		input: z.string().uuid(),
-		resolve: async ({ input }) => {
-			await prisma.recipe.update({
+		resolve: async ({ input, ctx }) => {
+			const { count } = await prisma.recipe.updateMany({
 				where: {
-					id: input
+					id: input,
+					...filterByUserId(ctx.user.id)
 				},
 				data: {
 					state: 'ARCHIVED'
 				}
 			});
+
+			if (count === 0) {
+				throw new trpc.TRPCError({
+					code: 'NOT_FOUND',
+					message: 'The recipe does not exist.'
+				});
+			}
 		}
 	});
 
