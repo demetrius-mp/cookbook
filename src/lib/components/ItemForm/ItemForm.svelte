@@ -23,7 +23,7 @@
 
 	let errors: SaveItemError | undefined;
 
-	const { handleSubmit, form, isSubmitting } = createForm<SaveItem>({
+	const { handleSubmit, form, isSubmitting, handleReset } = createForm<SaveItem>({
 		initialValues: item,
 		onSubmit: async (values) => {
 			try {
@@ -36,6 +36,7 @@
 				});
 
 				errors = undefined;
+				handleReset();
 
 				dispatch('submit');
 			} catch (e) {

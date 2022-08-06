@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import InputError from '$lib/components/InputError/InputError.svelte';
+	import ItemForm from '$lib/components/ItemForm/ItemForm.svelte';
 
 	import toastStore from '$lib/components/Toast/toast.store';
 	import trpcClient, { type InferMutationInput, type InferQueryOutput } from '$lib/trpcClient';
@@ -87,6 +88,16 @@
 	}
 
 	$: addNewItemButtonIsDisabled = $form.items.length === items.length;
+
+	let createNewItemModalIsOpen = false;
+	const openCreateNewItemModal = () => (createNewItemModalIsOpen = true);
+	const closeCreateNewItemModal = () => (createNewItemModalIsOpen = false);
+
+	async function handleCreateNewItem() {
+		closeCreateNewItemModal();
+
+		items = await trpcClient().query('items:list');
+	}
 </script>
 
 <form
@@ -134,7 +145,9 @@
 					<label for="itemName" class="label">
 						<span class="label-text">Item name</span>
 						<span class="label-text-alt text-sm">
-							<a class="link" href="/items/new">Create a new item</a>
+							<button type="button" class="link" on:click={openCreateNewItemModal}>
+								Create a new item
+							</button>
 						</span>
 					</label>
 					{#if items.length === 0}
@@ -190,3 +203,15 @@
 		Save recipe
 	</button>
 </form>
+
+<input
+	type="checkbox"
+	id="createNewItemModal"
+	class="modal-toggle"
+	bind:checked={createNewItemModalIsOpen}
+/>
+<label for="createNewItemModal" class="modal cursor-pointer">
+	<label for="" class="modal-box relative">
+		<ItemForm on:submit={handleCreateNewItem} />
+	</label>
+</label>
