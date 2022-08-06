@@ -92,7 +92,7 @@ const recipeRouter = trpc
 
 				if (!recipe) {
 					throw new trpc.TRPCError({
-						code: 'BAD_REQUEST',
+						code: 'NOT_FOUND',
 						message: 'Recipe does not exist'
 					});
 				}

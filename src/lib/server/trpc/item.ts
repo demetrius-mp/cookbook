@@ -52,6 +52,19 @@ const itemRouter = trpc
 	.mutation('delete', {
 		input: z.string().uuid(),
 		resolve: async ({ input }) => {
+			const itemOnRecipe = await prisma.itemsOnRecipes.findFirst({
+				where: {
+					itemId: input
+				}
+			});
+
+			if (itemOnRecipe) {
+				throw new trpc.TRPCError({
+					code: 'CONFLICT',
+					message: "You can't delete an item that is being used on a recipe."
+				});
+			}
+
 			await prisma.item.update({
 				where: {
 					id: input

@@ -158,7 +158,7 @@
 				</div>
 				<div class="form-control w-full">
 					<label for="items[{i}].name" class="label">
-						<span class="label-text">Item name</span>
+						<span class="label-text">Amount</span>
 					</label>
 					<input
 						bind:value={recipeItem.amount}

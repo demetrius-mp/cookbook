@@ -18,6 +18,7 @@
 	import type { Item } from '@prisma/client';
 	import type { Load } from '@sveltejs/kit';
 	import { goto } from '$app/navigation';
+	import { TRPCClientError } from '@trpc/client';
 
 	export let items: Item[];
 
@@ -25,15 +26,25 @@
 		const confirmDelete = confirm('Are you sure you want to delete this item?');
 		if (!confirmDelete) return;
 
-		await trpcClient().mutation('items:delete', id);
+		try {
+			await trpcClient().mutation('items:delete', id);
 
-		toastStore.push({
-			kind: 'success',
-			message: 'Item deleted successfully',
-			removeAfter: 2000
-		});
+			toastStore.push({
+				kind: 'success',
+				message: 'Item deleted successfully',
+				removeAfter: 2000
+			});
 
-		items = await trpcClient().query('items:list');
+			items = await trpcClient().query('items:list');
+		} catch (e) {
+			if (e instanceof TRPCClientError) {
+				toastStore.push({
+					kind: 'error',
+					message: e.message,
+					removeAfter: 5000
+				});
+			}
+		}
 	}
 
 	async function handleEditItem(id: string) {
