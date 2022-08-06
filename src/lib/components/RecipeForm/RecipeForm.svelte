@@ -52,8 +52,10 @@
 	function makeNewItem(): SaveRecipe['items'][number] {
 		const itemToUseId =
 			items.find((v) => {
-				return $form && !$form.items.some((item) => item.id === v.id);
-			}) || items[0];
+				return $form && $form.items.length > 0 && !$form.items.some((item) => item.id === v.id);
+			}) ||
+			(items && items[0]) ||
+			'';
 
 		return {
 			amount: 0,
