@@ -1,10 +1,13 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import InputError from '$lib/components/InputError/InputError.svelte';
 	import ItemForm from '$lib/components/ItemForm/ItemForm.svelte';
 
 	import toastStore from '$lib/components/Toast/toast.store';
-	import trpcClient, { type InferMutationInput, type InferQueryOutput } from '$lib/trpcClient';
+	import trpcClient, {
+		type InferMutationInput,
+		type InferMutationOutput,
+		type InferQueryOutput
+	} from '$lib/trpcClient';
 	import { TRPCClientError } from '@trpc/client';
 	import { createEventDispatcher } from 'svelte';
 	import { createForm } from 'svelte-forms-lib';
@@ -50,7 +53,7 @@
 		}
 	});
 
-	function makeNewItem(): SaveRecipe['items'][number] {
+	function makeNewItem(selectedId?: string): SaveRecipe['items'][number] {
 		const itemToUseId =
 			items.find((v) => {
 				return $form && $form.items.length > 0 && !$form.items.some((item) => item.id === v.id);
@@ -58,19 +61,21 @@
 			(items && items[0]) ||
 			'';
 
+		const id = selectedId !== undefined ? selectedId : itemToUseId.id;
+
 		return {
 			amount: 0,
-			id: itemToUseId.id
+			id
 		};
 	}
 
 	let addNewItemButtonIsDisabled = recipe.items.length === items.length;
-	function addItem() {
+	function addItem(selectedId?: string) {
 		if ($form.items.length === items.length) {
 			return;
 		}
 
-		$form.items = [...$form.items, makeNewItem()];
+		$form.items = [...$form.items, makeNewItem(selectedId)];
 	}
 
 	function removeItem(index: number) {
@@ -92,12 +97,6 @@
 	let createNewItemModalIsOpen = false;
 	const openCreateNewItemModal = () => (createNewItemModalIsOpen = true);
 	const closeCreateNewItemModal = () => (createNewItemModalIsOpen = false);
-
-	async function handleCreateNewItem() {
-		closeCreateNewItemModal();
-
-		items = await trpcClient().query('items:list');
-	}
 </script>
 
 <form
@@ -153,7 +152,7 @@
 					{#if items.length === 0}
 						<button
 							type="button"
-							on:click={() => goto('/items/new')}
+							on:click={openCreateNewItemModal}
 							class="btn btn-outline btn-ghost justify-start">Create a new item</button
 						>
 					{:else}
@@ -189,10 +188,10 @@
 			<button
 				disabled={addNewItemButtonIsDisabled}
 				type="button"
-				on:click={addItem}
-				class="btn btn-outline btn-accent w-full"
+				on:click={() => addItem}
+				class="btn btn-accent btn-outline w-full"
 			>
-				+ New item
+				+ Add item
 			</button>
 		</div>
 	</div>
@@ -212,6 +211,12 @@
 />
 <label for="createNewItemModal" class="modal cursor-pointer">
 	<label for="" class="modal-box relative">
-		<ItemForm on:submit={handleCreateNewItem} />
+		<ItemForm
+			on:submit={async ({ detail }) => {
+				closeCreateNewItemModal();
+				items = await trpcClient().query('items:list');
+				addItem(detail.id);
+			}}
+		/>
 	</label>
 </label>

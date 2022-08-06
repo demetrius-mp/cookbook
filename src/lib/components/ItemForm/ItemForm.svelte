@@ -1,6 +1,6 @@
 <script lang="ts">
 	import toastStore from '$lib/components/Toast/toast.store';
-	import trpcClient, { type InferMutationInput } from '$lib/trpcClient';
+	import trpcClient, { type InferMutationInput, type InferMutationOutput } from '$lib/trpcClient';
 	import { createForm } from 'svelte-forms-lib';
 	import { createEventDispatcher } from 'svelte';
 	import { TRPCClientError } from '@trpc/client';
@@ -8,7 +8,7 @@
 	import type { ZodFormattedError } from 'zod';
 
 	const dispatch = createEventDispatcher<{
-		submit: void;
+		submit: InferMutationOutput<'items:save'>;
 	}>();
 
 	type SaveItem = InferMutationInput<'items:save'>;
@@ -27,7 +27,7 @@
 		initialValues: item,
 		onSubmit: async (values) => {
 			try {
-				await trpcClient().mutation('items:save', values);
+				const savedItem = await trpcClient().mutation('items:save', values);
 
 				toastStore.push({
 					kind: 'success',
@@ -38,7 +38,7 @@
 				errors = undefined;
 				handleReset();
 
-				dispatch('submit');
+				dispatch('submit', savedItem);
 			} catch (e) {
 				if (e instanceof TRPCClientError) {
 					errors = e.data.zodError;
