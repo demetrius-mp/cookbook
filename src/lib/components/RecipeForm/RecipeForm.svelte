@@ -3,11 +3,7 @@
 	import ItemForm from '$lib/components/ItemForm/ItemForm.svelte';
 
 	import toastStore from '$lib/components/Toast/toast.store';
-	import trpcClient, {
-		type InferMutationInput,
-		type InferMutationOutput,
-		type InferQueryOutput
-	} from '$lib/trpcClient';
+	import trpcClient, { type InferMutationInput, type InferQueryOutput } from '$lib/trpcClient';
 	import { TRPCClientError } from '@trpc/client';
 	import { createEventDispatcher } from 'svelte';
 	import { createForm } from 'svelte-forms-lib';
