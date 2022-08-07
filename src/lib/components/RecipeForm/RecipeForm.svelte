@@ -69,6 +69,7 @@
 
 	let addNewItemButtonIsDisabled = recipe.items.length === items.length;
 	function addItem(selectedId?: string) {
+		console.log($form.items, items);
 		if ($form.items.length === items.length) {
 			return;
 		}
@@ -186,7 +187,7 @@
 			<button
 				disabled={addNewItemButtonIsDisabled}
 				type="button"
-				on:click={() => addItem}
+				on:click={() => addItem()}
 				class="btn btn-accent btn-outline w-full"
 			>
 				+ Add item
