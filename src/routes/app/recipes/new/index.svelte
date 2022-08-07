@@ -20,4 +20,4 @@
 </script>
 
 <h3 class="text-4xl font-bold text-center">Add new recipe</h3>
-<RecipeForm on:submit={() => goto('/recipes')} {items} />
+<RecipeForm on:submit={() => goto('/app/recipes')} {items} />

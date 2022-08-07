@@ -5,4 +5,4 @@
 </script>
 
 <h3 class="text-4xl font-bold text-center">Add new item</h3>
-<ItemForm on:submit={() => goto('/items')} />
+<ItemForm on:submit={() => goto('/app/items')} />

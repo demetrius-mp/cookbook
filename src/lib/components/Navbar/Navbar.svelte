@@ -7,13 +7,15 @@
 </script>
 
 <div class="w-full navbar bg-base-200 lg:justify-end">
-	<div class="flex-none lg:hidden">
-		<button on:click={drawerStore.open} class="btn btn-square btn-ghost">
-			<IconMenu class="inline-block w-6 h-6 stroke-current" />
-		</button>
-	</div>
-	<div class="flex-1 lg:hidden">
-		<a href="/" class="btn btn-ghost normal-case text-xl">cookbook</a>
+	{#if $session.user}
+		<div class="flex-none lg:hidden">
+			<button on:click={drawerStore.open} class="btn btn-square btn-ghost">
+				<IconMenu class="inline-block w-6 h-6 stroke-current" />
+			</button>
+		</div>
+	{/if}
+	<div class:lg:hidden={$session.user} class="flex-1">
+		<a href={$session.user ? '/app' : '/'} class="btn btn-ghost normal-case text-xl">cookbook</a>
 	</div>
 	<div class="flex gap-2">
 		<ThemeSelector />

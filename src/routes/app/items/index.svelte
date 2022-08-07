@@ -50,7 +50,7 @@
 	}
 
 	async function handleEditItem(id: string) {
-		await goto(`/items/${id}/edit`);
+		await goto(`/app/items/${id}/edit`);
 	}
 </script>
 
@@ -59,7 +59,7 @@
 		<h3 class="text-4xl font-bold">Items</h3>
 	</div>
 	<div class="sm:w-fit w-full">
-		<a class="btn btn-primary w-full" href="/items/new">+ New item</a>
+		<a class="btn btn-primary w-full" href="/app/items/new">+ New item</a>
 	</div>
 </div>
 

@@ -33,7 +33,7 @@
 				errors = undefined;
 				handleReset();
 
-				await goto('/recipes');
+				await goto('/app/recipes');
 			} catch (e) {
 				if (e instanceof TRPCClientError) {
 					errors = e.data.zodError;

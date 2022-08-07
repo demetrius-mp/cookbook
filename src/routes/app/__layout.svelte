@@ -8,10 +8,7 @@
 				redirect: '/sign-in'
 			};
 		}
-
-		return {
-			status: 302,
-			redirect: '/app'
-		};
 	};
 </script>
+
+<slot />

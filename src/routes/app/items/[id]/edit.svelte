@@ -4,7 +4,7 @@
 
 		if (!item) {
 			return {
-				redirect: '/items',
+				redirect: '/app/items',
 				status: 302
 			};
 		}
@@ -29,5 +29,5 @@
 
 <h3 class="text-4xl font-bold text-center">Edit item</h3>
 {#if item}
-	<ItemForm {item} on:submit={() => goto('/items')} />
+	<ItemForm {item} on:submit={() => goto('/app/items')} />
 {/if}

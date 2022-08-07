@@ -21,7 +21,6 @@
 	import IconTrash from '$lib/components/Icons/IconTrash.svelte';
 	import IconPencilAlt from '$lib/components/Icons/IconPencilAlt.svelte';
 	import IconDotsVertical from '$lib/components/Icons/IconDotsVertical.svelte';
-	import { session } from '$app/stores';
 
 	export let recipes: InferQueryOutput<'recipes:list'>;
 
@@ -56,7 +55,7 @@
 	}
 
 	async function handleEditRecipe(id: string) {
-		await goto(`/recipes/${id}/edit`);
+		await goto(`/app/recipes/${id}/edit`);
 	}
 
 	function closeDropdown() {
@@ -69,7 +68,7 @@
 		<h3 class="text-4xl font-bold">Recipes</h3>
 	</div>
 	<div class="sm:w-fit w-full">
-		<a class="btn btn-primary w-full" href="/recipes/new">+ New Recipe</a>
+		<a class="btn btn-primary w-full" href="/app/recipes/new">+ New Recipe</a>
 	</div>
 </div>
 

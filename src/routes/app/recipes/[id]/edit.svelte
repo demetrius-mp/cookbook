@@ -5,7 +5,7 @@
 
 		if (!dbRecipe) {
 			return {
-				redirect: '/recipes',
+				redirect: '/app/recipes',
 				status: 302
 			};
 		}
@@ -47,5 +47,5 @@
 
 <h3 class="text-4xl font-bold text-center">Edit recipe</h3>
 {#if dbRecipe}
-	<RecipeForm {items} {recipe} on:submit={() => goto('/recipes')} />
+	<RecipeForm {items} {recipe} on:submit={() => goto('/app/recipes')} />
 {/if}
