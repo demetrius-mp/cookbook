@@ -1,5 +1,6 @@
 import type { Context } from '$lib/server/trpc';
 import * as trpc from '@trpc/server';
+import { differenceBy, intersectionWith, isEqual } from 'lodash-es';
 
 export function filterByUserId(id: string) {
 	return {
@@ -20,4 +21,34 @@ export function createProtectedRouter() {
 			}
 		});
 	});
+}
+
+export function getItemsToCreate<T>(existingItems: T[], newItems: T[]) {
+	const itemsToCreate = differenceBy(newItems, existingItems, 'id');
+
+	return itemsToCreate;
+}
+
+export function getItemsToDelete<T>(existingItems: T[], newItems: T[]) {
+	const itemsToDelete = differenceBy(existingItems, newItems, 'id');
+
+	return itemsToDelete;
+}
+
+export function getItemsToUpdate<T>(existingItems: T[], newItems: T[]) {
+	const itemsToUpdate = intersectionWith(newItems, existingItems, (a, b) => !isEqual(a, b));
+
+	return itemsToUpdate;
+}
+
+export function getDiff<T>(existingItems: T[], newItems: T[]) {
+	const itemsToCreate = getItemsToCreate(existingItems, newItems);
+	const itemsToDelete = getItemsToDelete(existingItems, newItems);
+	const itemsToUpdate = getItemsToUpdate(existingItems, newItems);
+
+	return {
+		itemsToCreate,
+		itemsToDelete,
+		itemsToUpdate
+	};
 }

@@ -1,10 +1,23 @@
 import prisma from '$lib/server/prisma';
-import { createProtectedRouter } from '$lib/server/trpc/utils';
+import { createProtectedRouter, getDiff } from '$lib/server/trpc/utils';
 import { filterByUserId } from '$lib/server/trpc/utils';
-import type { Prisma } from '@prisma/client';
 import * as trpc from '@trpc/server';
-import { differenceBy, intersectionWith, isEqual } from 'lodash-es';
 import { z } from 'zod';
+
+async function userAlreadyAcceptedRecipeShare(userId: string, recipeId: string) {
+	const alreadyAcceptedShare = (await prisma.usersOnSharedRecipes.findUnique({
+		where: {
+			userId_sharedRecipeRecipeId: {
+				sharedRecipeRecipeId: recipeId,
+				userId
+			}
+		}
+	}))
+		? true
+		: false;
+
+	return alreadyAcceptedShare;
+}
 
 const recipeRouter = createProtectedRouter()
 	.query('findById', {
@@ -55,6 +68,7 @@ const recipeRouter = createProtectedRouter()
 	})
 	.mutation('save', {
 		input: z.object({
+			isShared: z.boolean().default(false),
 			id: z.string().optional(),
 			name: z.string().min(3),
 			items: z.array(
@@ -64,63 +78,93 @@ const recipeRouter = createProtectedRouter()
 				})
 			)
 		}),
-		resolve: async ({ input: { id, ...data }, ctx }) => {
-			const computedData:
-				| (Prisma.Without<Prisma.RecipeCreateInput, Prisma.RecipeUncheckedCreateInput> &
-						Prisma.RecipeUncheckedCreateInput)
-				| (Prisma.Without<Prisma.RecipeUncheckedCreateInput, Prisma.RecipeCreateInput> &
-						Prisma.RecipeCreateInput) = {
-				name: data.name,
-				userId: ctx.user.id,
-				items: {
-					create: data.items.map((item) => {
-						return {
-							amount: item.amount,
+		resolve: async ({ input: { id, isShared, items, ...input }, ctx }) => {
+			const recipe = await prisma.recipe.findUnique({
+				where: {
+					id
+				},
+				include: {
+					items: {
+						include: {
 							item: {
-								connect: {
-									id: item.id
-								}
+								select: prisma.$exclude('item', ['createdAt', 'id', 'updatedAt', 'state', 'userId'])
 							}
-						};
-					})
+						}
+					}
 				}
-			};
+			});
 
-			if (id) {
-				const recipe = await prisma.recipe.findUnique({
-					where: {
-						id,
-						...filterByUserId(ctx.user.id)
-					},
-					include: {
-						items: true
+			if (!recipe) {
+				throw new trpc.TRPCError({
+					code: 'NOT_FOUND',
+					message: 'The recipe does not exist.'
+				});
+			}
+
+			if (isShared) {
+				const alreadyAcceptedShare = await userAlreadyAcceptedRecipeShare(ctx.user.id, recipe.id);
+
+				const createdRecipe = await prisma.recipe.create({
+					data: {
+						...input,
+						userId: ctx.user.id
 					}
 				});
 
-				if (!recipe) {
+				if (!alreadyAcceptedShare) {
+					await prisma.$transaction(
+						recipe.items.map(({ item, amount }) => {
+							return prisma.itemsOnRecipes.create({
+								data: {
+									amount,
+									item: {
+										create: {
+											...item,
+											userId: ctx.user.id
+										}
+									},
+									recipe: {
+										connect: {
+											id: createdRecipe.id
+										}
+									}
+								}
+							});
+						})
+					);
+
+					return createdRecipe;
+				} else {
+					throw new trpc.TRPCError({
+						code: 'CONFLICT',
+						message: 'You already accepted this shared recipe.'
+					});
+				}
+			}
+
+			if (id) {
+				if (recipe.userId !== ctx.user.id) {
 					throw new trpc.TRPCError({
 						code: 'NOT_FOUND',
 						message: 'The recipe does not exist.'
 					});
 				}
 
-				const existingItems: typeof data.items = recipe.items.map((item) => {
+				const existingItems: typeof items = recipe.items.map((item) => {
 					return {
 						id: item.itemId,
 						amount: item.amount
 					};
 				});
 
-				const itemsToCreate = differenceBy(data.items, existingItems, 'id');
-				const itemsToDelete = differenceBy(existingItems, data.items, 'id');
-				const itemsToUpdate = intersectionWith(data.items, existingItems, (a, b) => !isEqual(a, b));
+				const { itemsToCreate, itemsToDelete, itemsToUpdate } = getDiff(existingItems, items);
 
-				return await prisma.recipe.update({
+				const updatedRecipe = await prisma.recipe.update({
 					where: {
 						id: recipe.id
 					},
 					data: {
-						...data,
+						...input,
 						items: {
 							create: itemsToCreate.map(({ id, ...rest }) => ({
 								...rest,
@@ -137,11 +181,30 @@ const recipeRouter = createProtectedRouter()
 						}
 					}
 				});
+
+				return updatedRecipe;
 			}
 
-			return await prisma.recipe.create({
-				data: computedData
+			const createdRecipe = await prisma.recipe.create({
+				data: {
+					...input,
+					userId: ctx.user.id,
+					items: {
+						create: items.map((item) => {
+							return {
+								amount: item.amount,
+								item: {
+									connect: {
+										id: item.id
+									}
+								}
+							};
+						})
+					}
+				}
 			});
+
+			return createdRecipe;
 		}
 	})
 	.mutation('delete', {
@@ -199,6 +262,44 @@ const recipeRouter = createProtectedRouter()
 					sharingUserId: ctx.user.id
 				}
 			});
+		}
+	})
+	.query('findShared', {
+		input: z.string().uuid(),
+		resolve: async ({ ctx, input }) => {
+			const recipe = await prisma.recipe.findUnique({
+				where: {
+					id: input
+				},
+				include: {
+					items: {
+						select: {
+							amount: true,
+							itemId: true
+						}
+					}
+				}
+			});
+
+			if (!recipe) {
+				return null;
+			}
+
+			const alreadyAcceptedShare = (await prisma.usersOnSharedRecipes.findUnique({
+				where: {
+					userId_sharedRecipeRecipeId: {
+						sharedRecipeRecipeId: recipe.id,
+						userId: ctx.user.id
+					}
+				}
+			}))
+				? true
+				: false;
+
+			return {
+				...recipe,
+				alreadyAcceptedShare
+			};
 		}
 	});
 

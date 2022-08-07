@@ -64,9 +64,9 @@
 		try {
 			await trpcClient().mutation('recipes:share', id);
 
-			console.log(window.location.origin);
+			const sharingLink = `${window.location.origin}/app/recipes/${id}/share`;
 
-			navigator.clipboard.writeText('');
+			navigator.clipboard.writeText(sharingLink);
 
 			toastStore.push({
 				kind: 'success',

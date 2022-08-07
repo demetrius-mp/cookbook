@@ -18,16 +18,37 @@ const itemRouter = createProtectedRouter()
 		}
 	})
 	.query('list', {
-		resolve: async ({ ctx }) => {
-			return await prisma.item.findMany({
+		input: z
+			.object({
+				includedInRecipe: z.string().uuid().optional()
+			})
+			.optional(),
+		resolve: async ({ ctx, input }) => {
+			const items = await prisma.item.findMany({
 				orderBy: {
 					name: 'asc'
 				},
 				where: {
 					state: 'VISIBLE',
-					...filterByUserId(ctx.user.id)
+					OR: [
+						filterByUserId(ctx.user.id),
+						{
+							recipes: {
+								some:
+									input && input.includedInRecipe
+										? {
+												recipeId: input.includedInRecipe
+										  }
+										: undefined
+							}
+						}
+					]
 				}
 			});
+
+			console.log(items);
+
+			return items;
 		}
 	})
 	.mutation('save', {
