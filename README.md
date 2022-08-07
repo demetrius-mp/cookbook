@@ -2,4 +2,4 @@
 
 # To Do
 
-- [ ] Authentication
+- [ ] Sharing recipe feature

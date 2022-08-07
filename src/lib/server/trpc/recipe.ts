@@ -164,6 +164,42 @@ const recipeRouter = createProtectedRouter()
 				});
 			}
 		}
+	})
+	.mutation('share', {
+		input: z.string().uuid(),
+		resolve: async ({ ctx, input }) => {
+			const recipe = await prisma.recipe.findFirst({
+				where: {
+					id: input,
+					...filterByUserId(ctx.user.id)
+				}
+			});
+
+			if (!recipe) {
+				throw new trpc.TRPCError({
+					code: 'NOT_FOUND',
+					message: 'The recipe does not exist.'
+				});
+			}
+
+			const alreadySharedRecipe = await prisma.sharedRecipe.findFirst({
+				where: {
+					sharingUserId: ctx.user.id,
+					recipeId: recipe.id
+				}
+			});
+
+			if (alreadySharedRecipe) {
+				return;
+			}
+
+			await prisma.sharedRecipe.create({
+				data: {
+					recipeId: input,
+					sharingUserId: ctx.user.id
+				}
+			});
+		}
 	});
 
 export default recipeRouter;

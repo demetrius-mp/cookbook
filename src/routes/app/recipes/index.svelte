@@ -21,6 +21,8 @@
 	import IconTrash from '$lib/components/Icons/IconTrash.svelte';
 	import IconPencilAlt from '$lib/components/Icons/IconPencilAlt.svelte';
 	import IconDotsVertical from '$lib/components/Icons/IconDotsVertical.svelte';
+	import IconShare from '$lib/components/Icons/IconShare.svelte';
+	import { TRPCClientError } from '@trpc/client';
 
 	export let recipes: InferQueryOutput<'recipes:list'>;
 
@@ -58,6 +60,26 @@
 		await goto(`/app/recipes/${id}/edit`);
 	}
 
+	async function handleShareRecipe(id: string) {
+		try {
+			await trpcClient().mutation('recipes:share', id);
+
+			console.log(window.location.origin);
+
+			navigator.clipboard.writeText('');
+
+			toastStore.push({
+				kind: 'success',
+				message: 'Copied sharing link to clipboard!',
+				removeAfter: 2000
+			});
+		} catch (e) {
+			if (e instanceof TRPCClientError) {
+				console.error(e);
+			}
+		}
+	}
+
 	function closeDropdown() {
 		(document.activeElement as HTMLElement).blur();
 	}
@@ -80,7 +102,7 @@
 				transition:fade|local={{ duration: 300 }}
 				class="col-span-1 flex flex-col rounded-lg"
 			>
-				<div class="card bg-base-200 shadow-xl">
+				<div class="card bg-base-200 shadow-xl overflow-visible">
 					<div class="card-body p-5">
 						<div class="flex justify-between items-center gap-3">
 							<h2 class="card-title">{recipe.name}</h2>
@@ -94,9 +116,15 @@
 									class="dropdown-content menu p-2 shadow bg-base-100 rounded-box"
 								>
 									<li>
-										<button on:click={() => handleEditRecipe(recipe.id)} class="text-info">
+										<button on:click={() => handleEditRecipe(recipe.id)}>
 											<IconPencilAlt />
 											Edit
+										</button>
+									</li>
+									<li>
+										<button on:click={() => handleShareRecipe(recipe.id)}>
+											<IconShare />
+											Share
 										</button>
 									</li>
 									<li>

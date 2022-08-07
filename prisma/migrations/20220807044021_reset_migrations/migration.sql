@@ -7,6 +7,7 @@ CREATE TABLE "User" (
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
+    "profilePictureUrl" TEXT,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -50,6 +51,23 @@ CREATE TABLE "Recipe" (
     CONSTRAINT "Recipe_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "SharedRecipe" (
+    "sharingUserId" TEXT NOT NULL,
+    "recipeId" TEXT NOT NULL,
+
+    CONSTRAINT "SharedRecipe_pkey" PRIMARY KEY ("sharingUserId","recipeId")
+);
+
+-- CreateTable
+CREATE TABLE "UsersOnSharedRecipes" (
+    "userId" TEXT NOT NULL,
+    "sharedRecipeSharingUserId" TEXT NOT NULL,
+    "sharedRecipeRecipeId" TEXT NOT NULL,
+
+    CONSTRAINT "UsersOnSharedRecipes_pkey" PRIMARY KEY ("userId","sharedRecipeRecipeId")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
@@ -64,3 +82,15 @@ ALTER TABLE "ItemsOnRecipes" ADD CONSTRAINT "ItemsOnRecipes_itemId_fkey" FOREIGN
 
 -- AddForeignKey
 ALTER TABLE "Recipe" ADD CONSTRAINT "Recipe_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "SharedRecipe" ADD CONSTRAINT "SharedRecipe_sharingUserId_fkey" FOREIGN KEY ("sharingUserId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "SharedRecipe" ADD CONSTRAINT "SharedRecipe_recipeId_fkey" FOREIGN KEY ("recipeId") REFERENCES "Recipe"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "UsersOnSharedRecipes" ADD CONSTRAINT "UsersOnSharedRecipes_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "UsersOnSharedRecipes" ADD CONSTRAINT "UsersOnSharedRecipes_sharedRecipeSharingUserId_sharedRecip_fkey" FOREIGN KEY ("sharedRecipeSharingUserId", "sharedRecipeRecipeId") REFERENCES "SharedRecipe"("sharingUserId", "recipeId") ON DELETE RESTRICT ON UPDATE CASCADE;
