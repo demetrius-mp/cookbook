@@ -28,7 +28,7 @@
 	export let recipe: InferQueryOutput<'recipes:findById'>;
 </script>
 
-<h3 class="text-4xl font-bold text-center">Copy recipe</h3>
+<h3 class="text-4xl font-bold text-center mb-5">View recipe</h3>
 {#if recipe}
 	<ListRecipes recipes={[recipe]} />
 {/if}

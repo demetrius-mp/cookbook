@@ -53,14 +53,18 @@ export async function getUserFromCookies(cookieString?: string) {
 		return null;
 	}
 
-	const { userId } = AuthService.verifyJwt(jwt);
+	try {
+		const { userId } = AuthService.verifyJwt(jwt);
 
-	const user = await prisma.user.findUnique({
-		where: {
-			id: userId
-		},
-		select: prisma.$exclude('user', ['password'])
-	});
+		const user = await prisma.user.findUnique({
+			where: {
+				id: userId
+			},
+			select: prisma.$exclude('user', ['password'])
+		});
 
-	return user;
+		return user;
+	} catch (e) {
+		return null;
+	}
 }

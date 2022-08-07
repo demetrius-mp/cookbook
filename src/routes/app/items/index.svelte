@@ -54,11 +54,11 @@
 	}
 </script>
 
-<div class="flex sm:flex-row flex-col justify-between items-center mb-5 gap-3">
+<div class="flex justify-between items-center mb-5 gap-3">
 	<div>
 		<h3 class="text-4xl font-bold">Items</h3>
 	</div>
-	<div class="sm:w-fit w-full">
+	<div class="">
 		<a class="btn btn-primary w-full" href="/app/items/new">+ New item</a>
 	</div>
 </div>

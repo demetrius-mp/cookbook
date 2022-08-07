@@ -24,7 +24,7 @@
 	<div>
 		<h3 class="text-4xl font-bold">Browsing recipes</h3>
 		<small class="text-sm">
-			<a class="link" href="/app/recipes">Browse through my recipes.</a>
+			<a class="link" href="/app/recipes">Browse my recipes.</a>
 		</small>
 	</div>
 </div>

@@ -18,14 +18,14 @@
 	export let recipes: InferQueryOutput<'recipes:list'>;
 </script>
 
-<div class="flex sm:flex-row flex-col justify-between items-center mb-5 gap-3">
+<div class="flex justify-between items-center mb-5 gap-3">
 	<div>
 		<h3 class="text-4xl font-bold">Recipes</h3>
 		<small class="text-sm">
-			<a class="link" href="/app/recipes/browse">Browse through other users recipes.</a>
+			<a class="link" href="/app/recipes/browse">Browse other recipes.</a>
 		</small>
 	</div>
-	<div class="sm:w-fit w-full">
+	<div class="">
 		<a class="btn btn-primary w-full" href="/app/recipes/new">+ New Recipe</a>
 	</div>
 </div>
