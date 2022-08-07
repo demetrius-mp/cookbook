@@ -45,6 +45,8 @@
 				if (e instanceof TRPCClientError) {
 					errors = e.data.zodError;
 				}
+
+				console.error(e);
 			}
 		}
 	});

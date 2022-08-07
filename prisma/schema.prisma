@@ -12,6 +12,8 @@ datasource db {
 
 enum STATE {
   VISIBLE
+  PRIVATE
+  PUBLIC
   ARCHIVED
 }
 
@@ -25,9 +27,6 @@ model User {
 
   items   Item[]
   recipes Recipe[]
-
-  sharedRecipes         SharedRecipe[]
-  acceptedSharedRecipes UsersOnSharedRecipes[]
 }
 
 model Item {
@@ -77,30 +76,4 @@ model Recipe {
 
   user   User   @relation(fields: [userId], references: [id])
   userId String
-
-  sharedRecipe SharedRecipe[]
-}
-
-model SharedRecipe {
-  sharingUserId String
-  sharingUser   User   @relation(fields: [sharingUserId], references: [id])
-
-  recipeId String
-  recipe   Recipe @relation(fields: [recipeId], references: [id])
-
-  acceptedShareUsers UsersOnSharedRecipes[]
-
-  @@id([sharingUserId, recipeId])
-}
-
-model UsersOnSharedRecipes {
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
-
-  sharedRecipe SharedRecipe @relation(fields: [sharedRecipeSharingUserId, sharedRecipeRecipeId], references: [sharingUserId, recipeId])
-
-  sharedRecipeSharingUserId String
-  sharedRecipeRecipeId      String
-
-  @@id([userId, sharedRecipeRecipeId])
 }

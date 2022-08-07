@@ -46,8 +46,6 @@ const itemRouter = createProtectedRouter()
 				}
 			});
 
-			console.log(items);
-
 			return items;
 		}
 	})

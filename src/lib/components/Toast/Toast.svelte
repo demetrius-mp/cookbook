@@ -9,45 +9,31 @@
 	export let message: ToastProps['message'];
 	export let kind: ToastProps['kind'] = 'success';
 	export let removeAfter: ToastProps['removeAfter'] = 'never';
-	export let promise: ToastProps['promise'] = undefined;
 
-	if (!promise && removeAfter !== 'never') {
+	if (removeAfter !== 'never') {
 		toastStore.closeAfter({
 			id,
 			milliseconds: removeAfter
 		});
 	}
 
-	async function awaitToastPromise() {
-		if (promise) {
-			await promise.resolve();
-
-			if (removeAfter !== 'never') {
-				toastStore.closeAfter({
-					id,
-					milliseconds: removeAfter
-				});
-			}
-		}
-	}
-
 	const className: Record<ToastProps['kind'], string> = {
 		error: 'alert-error',
 		info: 'alert-info',
 		success: 'alert-success',
-		warning: 'alert-warning'
+		warning: 'alert-warning',
+		loading: ''
 	};
 </script>
 
-<div transition:fade class="alert {className[kind]} min-w-[256px] block">
-	{#await awaitToastPromise()}
-		<div>
+<div
+	transition:fade={{ duration: kind === 'loading' ? 0 : undefined }}
+	class="alert {className[kind]} min-w-[256px] block"
+>
+	<div>
+		{#if kind === 'loading'}
 			<Spinner />
-			<span>{promise?.message}</span>
-		</div>
-	{:then _}
-		<div>
-			<span>{message}</span>
-		</div>
-	{/await}
+		{/if}
+		<span>{message}</span>
+	</div>
 </div>

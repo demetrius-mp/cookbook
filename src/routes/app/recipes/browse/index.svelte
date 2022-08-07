@@ -1,6 +1,8 @@
 <script lang="ts" context="module">
 	export const load: Load = async ({ fetch }) => {
-		const recipes = await trpcClient(fetch).query('recipes:list');
+		const recipes = await trpcClient(fetch).query('recipes:list', {
+			filterByCurrentUser: false
+		});
 
 		return {
 			props: {
@@ -20,14 +22,11 @@
 
 <div class="flex sm:flex-row flex-col justify-between items-center mb-5 gap-3">
 	<div>
-		<h3 class="text-4xl font-bold">Recipes</h3>
+		<h3 class="text-4xl font-bold">Browsing recipes</h3>
 		<small class="text-sm">
-			<a class="link" href="/app/recipes/browse">Browse through other users recipes.</a>
+			<a class="link" href="/app/recipes">Browse through my recipes.</a>
 		</small>
-	</div>
-	<div class="sm:w-fit w-full">
-		<a class="btn btn-primary w-full" href="/app/recipes/new">+ New Recipe</a>
 	</div>
 </div>
 
-<ListRecipes {recipes} viewType="own" />
+<ListRecipes {recipes} viewType="browsing" />

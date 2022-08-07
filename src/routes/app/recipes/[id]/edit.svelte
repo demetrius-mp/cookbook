@@ -1,6 +1,9 @@
 <script lang="ts" context="module">
 	export const load: Load = async ({ params, fetch }) => {
-		const dbRecipe = await trpcClient(fetch).query('recipes:findById', params.id);
+		const dbRecipe = await trpcClient(fetch).query('recipes:findById', {
+			id: params.id,
+			filterByCurrentUser: true
+		});
 		const items = await trpcClient(fetch).query('items:list');
 
 		if (!dbRecipe) {
@@ -37,7 +40,7 @@
 			name: dbRecipe?.name,
 			items: dbRecipe?.items.map((item) => {
 				return {
-					id: item.itemId,
+					id: item.item.id,
 					amount: item.amount
 				};
 			})
