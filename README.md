@@ -1,5 +1,5 @@
 # cookbook
 
-# To Do
+# To do
 
-- [ ] Sharing recipe feature
+Write a decent readme
