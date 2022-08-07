@@ -28,7 +28,6 @@
 	<div class="flex gap-2">
 		<ThemeSelector />
 		{#if !$session.user}
-			<a class="btn btn-accent btn-outline" href="/sign-up">Sign up</a>
 			<a class="btn btn-secondary btn-outline" href="/sign-in">Sign in</a>
 		{:else}
 			<ProfileDropdown />
