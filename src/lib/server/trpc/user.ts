@@ -16,20 +16,25 @@ function generateGravatarUrl(email: string) {
 const userRouter = trpc
 	.router<inferAsyncReturnType<typeof createContext>>()
 	.mutation('sign-up', {
-		input: z.object({
-			name: z.string().min(3),
-			email: z.string().email(),
-			password: z.string().min(8),
-			profilePictureUrl: z.string().url().optional()
-		}),
-		resolve: async ({ input: { password, profilePictureUrl, ...input } }) => {
+		input: z
+			.object({
+				name: z.string().min(3),
+				email: z.string().email(),
+				password: z.string().min(8),
+				confirmPassword: z.string().min(8)
+			})
+			.refine((data) => data.password === data.confirmPassword, {
+				message: 'Passwords must match',
+				path: ['confirmPassword']
+			}),
+		resolve: async ({ input: { confirmPassword, password, ...input } }) => {
 			const hashedPassword = await AuthService.generatePasswordHash(password);
 
 			return await prisma.user.create({
 				data: {
 					...input,
 					password: hashedPassword,
-					profilePictureUrl: profilePictureUrl || generateGravatarUrl(input.email)
+					profilePictureUrl: generateGravatarUrl(input.email)
 				},
 				select: prisma.$exclude('user', ['password'])
 			});
@@ -50,7 +55,7 @@ const userRouter = trpc
 			if (!user || !AuthService.verifyPassword(input.password, user.password)) {
 				throw new trpc.TRPCError({
 					code: 'UNAUTHORIZED',
-					message: 'Invalid credentials'
+					message: 'Invalid credentials.'
 				});
 			}
 
@@ -95,7 +100,12 @@ const userRouter = trpc
 			name: z.string().min(8),
 			email: z.string().email(),
 			currentPassword: z.string().min(8),
-			newPassword: z.string().min(8).optional(),
+			newPassword: z
+				.string()
+				.optional()
+				.transform((newPassword) =>
+					newPassword && newPassword.length > 8 ? newPassword : undefined
+				),
 			profilePictureUrl: z.string().url().optional()
 		}),
 		resolve: async ({ input: { currentPassword, newPassword, ...input }, ctx }) => {

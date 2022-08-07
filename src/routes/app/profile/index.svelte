@@ -21,7 +21,7 @@
 			name,
 			profilePictureUrl: profilePictureUrl || '',
 			currentPassword: '',
-			newPassword: undefined
+			newPassword: ''
 		},
 		onSubmit: async (values) => {
 			try {

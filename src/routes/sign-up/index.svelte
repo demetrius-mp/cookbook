@@ -29,7 +29,8 @@
 		initialValues: {
 			email: '',
 			name: '',
-			password: ''
+			password: '',
+			confirmPassword: ''
 		},
 		onSubmit: async (values) => {
 			try {
@@ -112,6 +113,21 @@
 				class:input-error={errors?.password?._errors}
 			/>
 			<InputError errors={errors?.password?._errors} />
+		</div>
+
+		<div class="form-control w-full">
+			<label for="confirmPassword" class="label">
+				<span class="label-text">Confirm password</span>
+			</label>
+			<input
+				bind:value={$form.confirmPassword}
+				required
+				name="confirmPassword"
+				type="password"
+				class="input input-bordered w-full"
+				class:input-error={errors?.confirmPassword?._errors}
+			/>
+			<InputError errors={errors?.confirmPassword?._errors} />
 		</div>
 
 		<button

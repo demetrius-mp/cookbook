@@ -33,7 +33,6 @@
 		},
 		onSubmit: async (values) => {
 			try {
-				console.log(values);
 				const user = await trpcClient().mutation('users:sign-in', values);
 				$session.user = user;
 
@@ -49,6 +48,13 @@
 				await goto('/app/recipes');
 			} catch (e) {
 				if (e instanceof TRPCClientError) {
+					if (e.data.code === 'UNAUTHORIZED') {
+						toastStore.push({
+							kind: 'error',
+							message: e.message,
+							removeAfter: 3000
+						});
+					}
 					errors = e.data.zodError;
 				}
 
