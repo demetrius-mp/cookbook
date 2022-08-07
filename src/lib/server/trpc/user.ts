@@ -89,6 +89,58 @@ const userRouter = trpc
 
 			ctx.event.locals.hasCookie = jwtCookie;
 		}
+	})
+	.mutation('update', {
+		input: z.object({
+			name: z.string().min(8),
+			email: z.string().email(),
+			currentPassword: z.string().min(8),
+			newPassword: z.string().min(8).optional(),
+			profilePictureUrl: z.string().url().optional()
+		}),
+		resolve: async ({ input: { currentPassword, newPassword, ...input }, ctx }) => {
+			if (!ctx.user) {
+				throw new trpc.TRPCError({
+					code: 'UNAUTHORIZED'
+				});
+			}
+
+			const user = await prisma.user.findUnique({
+				where: {
+					id: ctx.user.id
+				}
+			});
+
+			if (!user || !(await AuthService.verifyPassword(currentPassword, user.password))) {
+				throw new trpc.TRPCError({
+					code: 'BAD_REQUEST',
+					message: 'Incorrect password.',
+					cause: new z.ZodError([
+						{
+							code: 'custom',
+							message: 'Incorrect password',
+							path: ['currentPassword']
+						}
+					])
+				});
+			}
+
+			const password = newPassword
+				? await AuthService.generatePasswordHash(newPassword)
+				: undefined;
+
+			const { password: _, ...userWithoutPassword } = await prisma.user.update({
+				where: {
+					id: ctx.user.id
+				},
+				data: {
+					...input,
+					password: password
+				}
+			});
+
+			return userWithoutPassword;
+		}
 	});
 
 export default userRouter;
