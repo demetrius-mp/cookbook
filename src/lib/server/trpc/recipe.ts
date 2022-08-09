@@ -52,7 +52,7 @@ const recipeRouter = createProtectedRouter()
 				page: 1
 			}),
 		resolve: async ({ ctx, input }) => {
-			const pageSize = 1;
+			const pageSize = 6;
 			const skip = (input.page - 1) * pageSize;
 			const take = pageSize;
 
