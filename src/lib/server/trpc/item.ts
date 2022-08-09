@@ -20,9 +20,11 @@ const itemRouter = createProtectedRouter()
 	.query('list', {
 		input: z
 			.object({
-				includedInRecipe: z.string().uuid().optional()
+				query: z.string().optional()
 			})
-			.optional(),
+			.default({
+				query: undefined
+			}),
 		resolve: async ({ ctx, input }) => {
 			const items = await prisma.item.findMany({
 				orderBy: {
@@ -30,19 +32,11 @@ const itemRouter = createProtectedRouter()
 				},
 				where: {
 					state: 'VISIBLE',
-					OR: [
-						filterByUserId(ctx.user.id),
-						{
-							recipes: {
-								some:
-									input && input.includedInRecipe
-										? {
-												recipeId: input.includedInRecipe
-										  }
-										: undefined
-							}
-						}
-					]
+					...filterByUserId(ctx.user.id),
+					name: {
+						contains: input.query,
+						mode: 'insensitive'
+					}
 				}
 			});
 
