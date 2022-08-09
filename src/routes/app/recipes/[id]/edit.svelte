@@ -27,6 +27,7 @@
 	import trpcClient, { type InferMutationInput, type InferQueryOutput } from '$lib/trpcClient';
 	import RecipeForm from '$lib/components/RecipeForm/RecipeForm.svelte';
 	import { goto } from '$app/navigation';
+	import TitleWithGoBackIcon from '$lib/components/TitleWithGoBackIcon/TitleWithGoBackIcon.svelte';
 
 	type SaveRecipe = InferQueryOutput<'recipes:findById'>;
 	export let dbRecipe: SaveRecipe;
@@ -48,7 +49,7 @@
 	}
 </script>
 
-<h3 class="text-4xl font-bold text-center">Edit recipe</h3>
+<TitleWithGoBackIcon href="/app/recipes" title="Edit recipe" />
 {#if dbRecipe}
 	<RecipeForm {items} {recipe} on:submit={() => goto('/app/recipes')} />
 {/if}

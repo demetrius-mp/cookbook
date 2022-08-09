@@ -2,7 +2,9 @@
 	import { goto } from '$app/navigation';
 
 	import ItemForm from '$lib/components/ItemForm/ItemForm.svelte';
+	import TitleWithGoBackIcon from '$lib/components/TitleWithGoBackIcon/TitleWithGoBackIcon.svelte';
 </script>
 
-<h3 class="text-4xl font-bold text-center">Add new item</h3>
+<TitleWithGoBackIcon href="/app/items" title="New item" />
+
 <ItemForm on:submit={() => goto('/app/items')} />

@@ -22,12 +22,14 @@
 	import trpcClient, { type InferQueryOutput } from '$lib/trpcClient';
 	import ItemForm from '$lib/components/ItemForm/ItemForm.svelte';
 	import { goto } from '$app/navigation';
+	import TitleWithGoBackIcon from '$lib/components/TitleWithGoBackIcon/TitleWithGoBackIcon.svelte';
 
 	type SaveItem = InferQueryOutput<'items:findById'>;
 	export let item: SaveItem;
 </script>
 
-<h3 class="text-4xl font-bold text-center">Edit item</h3>
+<TitleWithGoBackIcon href="/app/items" title="Edit item" />
+
 {#if item}
 	<ItemForm {item} on:submit={() => goto('/app/items')} />
 {/if}
