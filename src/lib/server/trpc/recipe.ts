@@ -22,7 +22,7 @@ const recipeRouter = createProtectedRouter()
 						select: {
 							amount: true,
 							item: {
-								select: prisma.$exclude('item', ['updatedAt', 'createdAt', 'updatedAt', 'state'])
+								select: prisma.$exclude('item', ['updatedAt', 'createdAt', 'updatedAt'])
 							}
 						}
 					},
@@ -56,7 +56,7 @@ const recipeRouter = createProtectedRouter()
 						select: {
 							amount: true,
 							item: {
-								select: prisma.$exclude('item', ['updatedAt', 'createdAt', 'updatedAt', 'state'])
+								select: prisma.$exclude('item', ['updatedAt', 'createdAt', 'updatedAt'])
 							}
 						}
 					},
@@ -110,7 +110,7 @@ const recipeRouter = createProtectedRouter()
 						select: {
 							amount: true,
 							item: {
-								select: prisma.$exclude('item', ['createdAt', 'id', 'updatedAt', 'state', 'userId'])
+								select: prisma.$exclude('item', ['createdAt', 'id', 'updatedAt', 'userId'])
 							}
 						}
 					}
@@ -176,13 +176,7 @@ const recipeRouter = createProtectedRouter()
 						items: {
 							include: {
 								item: {
-									select: prisma.$exclude('item', [
-										'createdAt',
-										'id',
-										'updatedAt',
-										'state',
-										'userId'
-									])
+									select: prisma.$exclude('item', ['createdAt', 'id', 'updatedAt', 'userId'])
 								}
 							}
 						}

@@ -31,7 +31,6 @@ const itemRouter = createProtectedRouter()
 					name: 'asc'
 				},
 				where: {
-					state: 'VISIBLE',
 					...filterByUserId(ctx.user.id),
 					name: {
 						contains: input.query,
@@ -86,25 +85,19 @@ const itemRouter = createProtectedRouter()
 	.mutation('delete', {
 		input: z.string().uuid(),
 		resolve: async ({ input, ctx }) => {
-			const itemOnRecipe = await prisma.itemsOnRecipes.findFirst({
-				where: {
-					itemId: input
-				}
-			});
-
-			if (itemOnRecipe) {
-				throw new trpc.TRPCError({
-					code: 'CONFLICT',
-					message: "You can't delete an item that is being used on a recipe."
-				});
-			}
-
-			const item = await prisma.item.findFirst({
-				where: {
-					id: input,
-					...filterByUserId(ctx.user.id)
-				}
-			});
+			const [itemOnRecipe, item] = await prisma.$transaction([
+				prisma.itemsOnRecipes.findFirst({
+					where: {
+						itemId: input
+					}
+				}),
+				prisma.item.findFirst({
+					where: {
+						id: input,
+						...filterByUserId(ctx.user.id)
+					}
+				})
+			]);
 
 			if (!item) {
 				throw new trpc.TRPCError({
@@ -113,12 +106,16 @@ const itemRouter = createProtectedRouter()
 				});
 			}
 
-			await prisma.item.update({
+			if (itemOnRecipe) {
+				throw new trpc.TRPCError({
+					code: 'CONFLICT',
+					message: "You can't delete an item that is being used on a recipe."
+				});
+			}
+
+			await prisma.item.delete({
 				where: {
 					id: item.id
-				},
-				data: {
-					state: 'ARCHIVED'
 				}
 			});
 		}

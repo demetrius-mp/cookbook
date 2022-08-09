@@ -39,8 +39,6 @@ model Item {
   amountKind String
   price      Float
 
-  state STATE @default(VISIBLE)
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -51,9 +49,7 @@ model Item {
 }
 
 model ItemsOnRecipes {
-  id String @id @default(uuid())
-
-  recipe   Recipe @relation(fields: [recipeId], references: [id])
+  recipe   Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
   recipeId String
 
   item   Item   @relation(fields: [itemId], references: [id])
@@ -63,6 +59,8 @@ model ItemsOnRecipes {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@id([recipeId, itemId])
 }
 
 model Recipe {
@@ -84,10 +82,10 @@ model Recipe {
 
 model UsersOnLikedRecipes {
   userId String
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   recipeId String
-  recipe   Recipe @relation(fields: [recipeId], references: [id])
+  recipe   Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
 
   @@id([userId, recipeId])
 }
