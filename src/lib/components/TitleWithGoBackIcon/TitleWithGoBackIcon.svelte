@@ -5,9 +5,11 @@
 	export let title: string | undefined = undefined;
 </script>
 
-<div class="grid grid-cols-3 justify-center items-center">
+<div class="grid grid-cols-3 justify-center items-center mb-3">
 	<a class="w-fit" {href}>
-		<IconArrowLeft />
+		<div>
+			<IconArrowLeft class="h-9 w-9" />
+		</div>
 	</a>
 	<div class="text-center">
 		{#if !title}
