@@ -142,7 +142,7 @@ const recipeRouter = createProtectedRouter()
 			items: z.array(
 				z.object({
 					id: z.string().uuid(),
-					amount: z.number().min(3)
+					amount: z.number().min(0.01)
 				})
 			)
 		}),

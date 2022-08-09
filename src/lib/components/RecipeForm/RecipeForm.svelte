@@ -112,6 +112,7 @@
 			name="recipeName"
 			type="text"
 			class="input input-bordered w-full"
+			minlength="3"
 			class:input-error={errors?.name?._errors}
 		/>
 		<InputError errors={errors?.name?._errors} />
@@ -176,7 +177,8 @@
 						required
 						name="amount"
 						type="number"
-						min="1"
+						min="0.01"
+						step="0.01"
 						class="input input-bordered w-full"
 						class:input-error={errors?.items?.[i]?.amount?._errors}
 					/>
