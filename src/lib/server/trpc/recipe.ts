@@ -41,60 +41,81 @@ const recipeRouter = createProtectedRouter()
 				filterByField: z
 					.enum(Object.keys(Prisma.RecipeScalarFieldEnum) as [keyof Recipe, ...(keyof Recipe)[]])
 					.default('name'),
-				query: z.string().optional()
+				query: z.string().optional(),
+				page: z.number().positive().default(1)
 			})
 			.default({
 				filterByCurrentUser: true,
 				filterByLiked: false,
 				filterByField: 'name',
-				query: undefined
+				query: undefined,
+				page: 1
 			}),
 		resolve: async ({ ctx, input }) => {
-			const recipes = await prisma.recipe.findMany({
-				include: {
-					items: {
-						select: {
-							amount: true,
-							item: {
-								select: prisma.$exclude('item', ['updatedAt', 'createdAt', 'updatedAt'])
+			const pageSize = 5;
+			const skip = (input.page - 1) * pageSize;
+			const take = pageSize;
+
+			const where: Prisma.RecipeWhereInput = {
+				state: 'VISIBLE',
+				likedByUsers: input.filterByLiked
+					? {
+							some: {
+								userId: ctx.user.id
+							}
+					  }
+					: undefined,
+				name: input.query
+					? {
+							contains: input.query,
+							mode: 'insensitive'
+					  }
+					: undefined,
+				userId: input.filterByCurrentUser ? ctx.user.id : undefined,
+				NOT: {
+					userId: !input.filterByCurrentUser ? ctx.user.id : undefined
+				}
+			};
+
+			const [recipes, totalItems] = await prisma.$transaction([
+				prisma.recipe.findMany({
+					include: {
+						items: {
+							select: {
+								amount: true,
+								item: {
+									select: prisma.$exclude('item', ['updatedAt', 'createdAt', 'updatedAt'])
+								}
+							}
+						},
+						likedByUsers: {
+							select: {
+								userId: true
+							},
+							where: {
+								userId: ctx.user.id
 							}
 						}
 					},
-					likedByUsers: {
-						select: {
-							userId: true
-						},
-						where: {
-							userId: ctx.user.id
+					orderBy: {
+						likedByUsers: {
+							_count: 'asc'
 						}
-					}
-				},
-				orderBy: {
-					likedByUsers: {
-						_count: 'asc'
-					}
-				},
-				where: {
-					state: 'VISIBLE',
-					likedByUsers: input.filterByLiked
-						? {
-								some: {
-									userId: ctx.user.id
-								}
-						  }
-						: undefined,
-					name: {
-						contains: input.query,
-						mode: 'insensitive'
 					},
-					userId: input.filterByCurrentUser ? ctx.user.id : undefined,
-					NOT: {
-						userId: !input.filterByCurrentUser ? ctx.user.id : undefined
-					}
-				}
-			});
+					where,
+					skip,
+					take
+				}),
+				prisma.recipe.count({
+					where
+				})
+			]);
 
-			return recipes;
+			return {
+				recipes,
+				totalItems,
+				pageSize
+			};
 		}
 	})
 	.mutation('saveCopy', {

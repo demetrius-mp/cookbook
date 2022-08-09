@@ -13,11 +13,12 @@
 	import IconClipboard from '$lib/components/Icons/IconClipboard.svelte';
 	import IconHeart from '$lib/components/Icons/IconHeart.svelte';
 	import { createEventDispatcher } from 'svelte';
+	import Pagination from '$lib/components/Pagination/Pagination.svelte';
 
 	export let recipes: InferQueryOutput<'recipes:list'>;
 	export let viewType: 'own' | 'browsing' = 'browsing';
 
-	$: computedRecipes = recipes.map((recipe) => {
+	$: computedRecipes = recipes.recipes.map((recipe) => {
 		const recipeItems = recipe.items.map((item) => {
 			return {
 				...item,
@@ -32,7 +33,7 @@
 		};
 	});
 
-	function userLikedRecipe(recipe: typeof recipes[number]) {
+	function userLikedRecipe(recipe: typeof recipes.recipes[number]) {
 		return recipe.likedByUsers.length > 0;
 	}
 
@@ -118,21 +119,6 @@
 				id,
 				result
 			});
-
-			// recipes = recipes.map((recipe) => {
-			// 	if (recipe.id === id && $session.user) {
-			// 		recipe.likedByUsers =
-			// 			result === 'liked'
-			// 				? [
-			// 						{
-			// 							userId: $session.user.id
-			// 						}
-			// 				  ]
-			// 				: [];
-			// 	}
-
-			// 	return recipe;
-			// });
 		} catch (e) {
 			if (e instanceof TRPCClientError) {
 				console.error(e);
@@ -153,6 +139,14 @@
 </script>
 
 {#if computedRecipes.length > 0}
+	<div class="mb-3">
+		<Pagination
+			on:pageChange
+			currentPage={1}
+			pageSize={recipes.pageSize}
+			totalItems={recipes.totalItems}
+		/>
+	</div>
 	<ul class="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
 		{#each computedRecipes as recipe (recipe.id)}
 			{@const liked = userLikedRecipe(recipe)}
@@ -248,7 +242,9 @@
 		{/each}
 	</ul>
 {:else}
-	<slot name="no results">
-		<h3 class="text-3xl">No recipes were found.</h3>
-	</slot>
+	<div class="flex flex-wrap">
+		<slot name="no results">
+			<h3 class="text-3xl">No recipes were found.</h3>
+		</slot>
+	</div>
 {/if}
