@@ -14,9 +14,11 @@
 	import IconHeart from '$lib/components/Icons/IconHeart.svelte';
 	import { createEventDispatcher } from 'svelte';
 	import Pagination from '$lib/components/Pagination/Pagination.svelte';
+	import { createForm } from 'svelte-forms-lib';
 
 	export let recipes: InferQueryOutput<'recipes:list'>;
 	export let viewType: 'own' | 'browsing' = 'browsing';
+	export let loadRecipes: (options: { query: string; page: number }) => Promise<typeof recipes>;
 
 	$: computedRecipes = recipes.recipes.map((recipe) => {
 		const recipeItems = recipe.items.map((item) => {
@@ -136,15 +138,57 @@
 			result: InferMutationOutput<'recipes:like'>;
 		};
 	}>();
+
+	const { form, isSubmitting, handleSubmit } = createForm({
+		initialValues: {
+			query: '',
+			currentPage: 1
+		},
+		onSubmit: async (values) => {
+			recipes = await loadRecipes({
+				page: values.currentPage,
+				query: values.query
+			});
+		}
+	});
 </script>
+
+<form on:submit={handleSubmit} class="w-full mb-5">
+	<div class="form-control">
+		<div class="input-group">
+			<input
+				type="search"
+				bind:value={$form.query}
+				placeholder="Search…"
+				class="input input-bordered w-full"
+			/>
+			<button type="submit" class:loading={$isSubmitting} class="btn btn-square">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-6 w-6"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+					/>
+				</svg>
+			</button>
+		</div>
+	</div>
+</form>
 
 {#if computedRecipes.length > 0}
 	<div class="mb-3">
 		<Pagination
-			on:pageChange
-			currentPage={1}
 			pageSize={recipes.pageSize}
 			totalItems={recipes.totalItems}
+			bind:currentPage={$form.currentPage}
+			on:pageChange={handleSubmit}
 		/>
 	</div>
 	<ul class="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
