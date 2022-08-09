@@ -66,7 +66,8 @@ const recipeRouter = createProtectedRouter()
 				where: {
 					state: 'VISIBLE',
 					name: {
-						contains: input.query
+						contains: input.query,
+						mode: 'insensitive'
 					},
 					userId: input.filterByCurrentUser ? ctx.user.id : undefined,
 					NOT: {
