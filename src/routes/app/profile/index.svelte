@@ -7,6 +7,8 @@
 	import type { ZodFormattedError } from 'zod';
 	import { goto } from '$app/navigation';
 	import { session } from '$app/stores';
+	import { MD5 } from 'crypto-js';
+	import IconInformationCircle from '$lib/components/Icons/IconInformationCircle.svelte';
 
 	type UpdateUser = InferMutationInput<'users:update'>;
 	type UpdateUserError = ZodFormattedError<UpdateUser>;
@@ -46,6 +48,30 @@
 			}
 		}
 	});
+
+	function generateGravatarUrl(email: string) {
+		const hashedEmail = MD5(email).toString();
+
+		return `https://www.gravatar.com/avatar/${hashedEmail}`;
+	}
+
+	async function setProfilePictureUrlUsingGravatar() {
+		const gravatarUrl = generateGravatarUrl($form.email);
+
+		const r = await fetch(gravatarUrl + '?d=404');
+
+		if (r.status === 404) {
+			toastStore.push({
+				kind: 'info',
+				message: `No Gravatar profile found!`,
+				removeAfter: 3000
+			});
+
+			return;
+		}
+
+		$form.profilePictureUrl = gravatarUrl + '?d=mp';
+	}
 </script>
 
 <h3 class="text-4xl font-bold text-center">Profile information</h3>
@@ -88,6 +114,20 @@
 	<div class="form-control w-full">
 		<label for="profilePictureUrl" class="label">
 			<span class="label-text">Profile picture URL</span>
+			<div class="label-text-alt flex items-center gap-1">
+				<button type="button" class="underline" on:click={setProfilePictureUrlUsingGravatar}>
+					Get from Gravatar
+				</button>
+				<button
+					title="What is Gravatar?"
+					type="button"
+					on:click={() => goto('https://en.gravatar.com/')}
+					class="btn btn-circle btn-ghost btn-xs text-info hover:text-info"
+				>
+					<IconInformationCircle />
+					<span class="sr-only"> What is Gravatar? </span>
+				</button>
+			</div>
 		</label>
 		<input
 			bind:value={$form.profilePictureUrl}
