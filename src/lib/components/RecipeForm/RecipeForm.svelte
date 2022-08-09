@@ -141,7 +141,7 @@
 					</button>
 				</div>
 				<div class="form-control w-full">
-					<label for="itemName" class="label">
+					<label for="items[{i}].name" class="label">
 						<span class="label-text">Item name</span>
 						<span class="label-text-alt text-sm">
 							<button type="button" class="link" on:click={openCreateNewItemModal}>
@@ -169,7 +169,7 @@
 					{/if}
 				</div>
 				<div class="form-control w-full">
-					<label for="items[{i}].name" class="label">
+					<label for="items[{i}].amount" class="label">
 						<span class="label-text">Amount</span>
 					</label>
 					<input
