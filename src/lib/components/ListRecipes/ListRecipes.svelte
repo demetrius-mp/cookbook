@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { formatCurrency } from '$lib/utils/formatting.util';
 	import toastStore from '$lib/components/Toast/toast.store';
-	import trpcClient, { type InferQueryOutput } from '$lib/trpcClient';
+	import trpcClient, { type InferMutationOutput, type InferQueryOutput } from '$lib/trpcClient';
 	import { goto } from '$app/navigation';
 	import { flip } from 'svelte/animate';
 	import { fade } from 'svelte/transition';
@@ -11,6 +11,8 @@
 	import IconShare from '$lib/components/Icons/IconShare.svelte';
 	import { TRPCClientError } from '@trpc/client';
 	import IconClipboard from '$lib/components/Icons/IconClipboard.svelte';
+	import IconHeart from '$lib/components/Icons/IconHeart.svelte';
+	import { createEventDispatcher } from 'svelte';
 
 	export let recipes: InferQueryOutput<'recipes:list'>;
 	export let viewType: 'own' | 'browsing' = 'browsing';
@@ -29,6 +31,10 @@
 			totalPrice: recipeItems.reduce((partial, { computedPrice }) => partial + computedPrice, 0)
 		};
 	});
+
+	function userLikedRecipe(recipe: typeof recipes[number]) {
+		return recipe.likedByUsers.length > 0;
+	}
 
 	async function handleDeleteRecipe(id: string) {
 		const confirmDelete = confirm('Are you sure you want to delete this item?');
@@ -102,14 +108,54 @@
 		}
 	}
 
+	async function handleLikeRecipe(id: string) {
+		try {
+			const result = await trpcClient().mutation('recipes:like', {
+				id
+			});
+
+			dispatch('like', {
+				id,
+				result
+			});
+
+			// recipes = recipes.map((recipe) => {
+			// 	if (recipe.id === id && $session.user) {
+			// 		recipe.likedByUsers =
+			// 			result === 'liked'
+			// 				? [
+			// 						{
+			// 							userId: $session.user.id
+			// 						}
+			// 				  ]
+			// 				: [];
+			// 	}
+
+			// 	return recipe;
+			// });
+		} catch (e) {
+			if (e instanceof TRPCClientError) {
+				console.error(e);
+			}
+		}
+	}
+
 	function closeDropdown() {
 		(document.activeElement as HTMLElement).blur();
 	}
+
+	const dispatch = createEventDispatcher<{
+		like: {
+			id: string;
+			result: InferMutationOutput<'recipes:like'>;
+		};
+	}>();
 </script>
 
 {#if computedRecipes.length > 0}
 	<ul class="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
 		{#each computedRecipes as recipe (recipe.id)}
+			{@const liked = userLikedRecipe(recipe)}
 			<li
 				animate:flip={{ duration: 500 }}
 				transition:fade|local={{ duration: 300 }}
@@ -129,6 +175,12 @@
 									class="dropdown-content menu p-2 shadow bg-base-100 rounded-box"
 								>
 									{#if viewType === 'browsing'}
+										<li>
+											<button on:click={() => handleLikeRecipe(recipe.id)}>
+												<IconHeart fill={liked} />
+												{liked ? 'Dislike' : 'Like'}
+											</button>
+										</li>
 										<li>
 											<button on:click={() => handleCopyRecipe(recipe.id)}>
 												<IconClipboard />

@@ -8,14 +8,14 @@
 <div class="grid grid-cols-3 justify-center items-center mb-3">
 	<a class="w-fit" {href}>
 		<div>
-			<IconArrowLeft class="h-9 w-9" />
+			<IconArrowLeft class="md:w-9 w-6" />
 		</div>
 	</a>
 	<div class="text-center">
 		{#if !title}
 			<slot />
 		{:else}
-			<h3 class="text-4xl font-bold text-center">{title}</h3>
+			<h3 class="md:text-4xl text-xl font-bold">{title}</h3>
 		{/if}
 	</div>
 </div>

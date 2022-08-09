@@ -1,7 +1,8 @@
 <script lang="ts" context="module">
 	export const load: Load = async ({ fetch }) => {
 		const recipes = await trpcClient(fetch).query('recipes:list', {
-			filterByCurrentUser: false
+			filterByCurrentUser: false,
+			filterByLiked: true
 		});
 
 		return {
@@ -17,7 +18,6 @@
 	import trpcClient, { type InferQueryOutput } from '$lib/trpcClient';
 	import ListRecipes from '$lib/components/ListRecipes/ListRecipes.svelte';
 	import { createForm } from 'svelte-forms-lib';
-	import { session } from '$app/stores';
 
 	export let recipes: InferQueryOutput<'recipes:list'>;
 
@@ -26,17 +26,22 @@
 			query: ''
 		},
 		onSubmit: async (values) => {
-			recipes = await trpcClient().query('recipes:list', {
-				filterByCurrentUser: false,
-				filterByField: 'name',
-				query: values.query
-			});
+			loadRecipes(values);
 		}
 	});
+
+	async function loadRecipes(values: typeof $form) {
+		recipes = await trpcClient().query('recipes:list', {
+			filterByCurrentUser: false,
+			filterByLiked: true,
+			filterByField: 'name',
+			query: values.query
+		});
+	}
 </script>
 
 <div class="flex flex-col justify-between items-start mb-5 gap-3">
-	<h3 class="text-4xl font-bold">Browsing recipes</h3>
+	<h3 class="text-4xl font-bold">Liked recipes</h3>
 	<form on:submit={handleSubmit} class="w-full">
 		<div class="form-control">
 			<div class="input-group">
@@ -67,23 +72,4 @@
 	</form>
 </div>
 
-<ListRecipes
-	on:like={({ detail }) => {
-		recipes = recipes.map((recipe) => {
-			if (recipe.id === detail.id && $session.user) {
-				recipe.likedByUsers =
-					detail.result === 'liked'
-						? [
-								{
-									userId: $session.user.id
-								}
-						  ]
-						: [];
-			}
-
-			return recipe;
-		});
-	}}
-	{recipes}
-	viewType="browsing"
-/>
+<ListRecipes on:like={() => loadRecipes({ query: '' })} {recipes} viewType="browsing" />

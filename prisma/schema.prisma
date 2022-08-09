@@ -27,6 +27,8 @@ model User {
 
   items   Item[]
   recipes Recipe[]
+
+  likedRecipes UsersOnLikedRecipes[]
 }
 
 model Item {
@@ -76,4 +78,16 @@ model Recipe {
 
   user   User   @relation(fields: [userId], references: [id])
   userId String
+
+  likedByUsers UsersOnLikedRecipes[]
+}
+
+model UsersOnLikedRecipes {
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  recipeId String
+  recipe   Recipe @relation(fields: [recipeId], references: [id])
+
+  @@id([userId, recipeId])
 }

@@ -69,7 +69,6 @@
 
 	let addNewItemButtonIsDisabled = recipe.items.length === items.length;
 	function addItem(selectedId?: string) {
-		console.log($form.items, items);
 		if ($form.items.length === items.length) {
 			return;
 		}

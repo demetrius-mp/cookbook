@@ -34,7 +34,6 @@
 
 	let isLoading = false;
 	async function triggerSearch(query: string) {
-		console.log(123);
 		isLoading = true;
 
 		options = await searchFunction(query);

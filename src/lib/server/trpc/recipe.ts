@@ -37,6 +37,7 @@ const recipeRouter = createProtectedRouter()
 		input: z
 			.object({
 				filterByCurrentUser: z.boolean().default(true),
+				filterByLiked: z.boolean().default(false),
 				filterByField: z
 					.enum(Object.keys(Prisma.RecipeScalarFieldEnum) as [keyof Recipe, ...(keyof Recipe)[]])
 					.default('name'),
@@ -44,11 +45,12 @@ const recipeRouter = createProtectedRouter()
 			})
 			.default({
 				filterByCurrentUser: true,
+				filterByLiked: false,
 				filterByField: 'name',
 				query: undefined
 			}),
 		resolve: async ({ ctx, input }) => {
-			return await prisma.recipe.findMany({
+			const recipes = await prisma.recipe.findMany({
 				include: {
 					items: {
 						select: {
@@ -58,13 +60,29 @@ const recipeRouter = createProtectedRouter()
 							}
 						}
 					},
-					_count: true
+					likedByUsers: {
+						select: {
+							userId: true
+						},
+						where: {
+							userId: ctx.user.id
+						}
+					}
 				},
 				orderBy: {
-					name: 'asc'
+					likedByUsers: {
+						_count: 'asc'
+					}
 				},
 				where: {
 					state: 'VISIBLE',
+					likedByUsers: input.filterByLiked
+						? {
+								some: {
+									userId: ctx.user.id
+								}
+						  }
+						: undefined,
 					name: {
 						contains: input.query,
 						mode: 'insensitive'
@@ -75,6 +93,8 @@ const recipeRouter = createProtectedRouter()
 					}
 				}
 			});
+
+			return recipes;
 		}
 	})
 	.mutation('saveCopy', {
@@ -238,6 +258,66 @@ const recipeRouter = createProtectedRouter()
 			});
 
 			return createdRecipe;
+		}
+	})
+	.mutation('like', {
+		input: z.object({
+			id: z.string().uuid(),
+			shouldDislikeIfAlreadyLiked: z.boolean().default(true)
+		}),
+		resolve: async ({ ctx, input }) => {
+			const recipe = await prisma.recipe.findFirst({
+				where: {
+					id: input.id
+				},
+				select: {
+					id: true,
+					userId: true,
+					likedByUsers: {
+						where: {
+							userId: ctx.user.id
+						}
+					}
+				}
+			});
+
+			if (!recipe) {
+				throw new trpc.TRPCError({
+					code: 'NOT_FOUND',
+					message: 'The recipe does not exist.'
+				});
+			}
+
+			if (recipe.userId === ctx.user.id) {
+				throw new trpc.TRPCError({
+					code: 'BAD_REQUEST',
+					message: "You can't like your own recipe!"
+				});
+			}
+
+			const recipeIsAlreadyLiked = recipe.likedByUsers.length !== 0;
+
+			if (recipeIsAlreadyLiked && input.shouldDislikeIfAlreadyLiked) {
+				await prisma.usersOnLikedRecipes.delete({
+					where: {
+						userId_recipeId: {
+							recipeId: input.id,
+							userId: ctx.user.id
+						}
+					}
+				});
+
+				return 'disliked';
+			}
+
+			await prisma.usersOnLikedRecipes.create({
+				data: {
+					recipeId: input.id,
+					userId: ctx.user.id
+				}
+			});
+
+			return 'liked';
 		}
 	})
 	.mutation('delete', {
