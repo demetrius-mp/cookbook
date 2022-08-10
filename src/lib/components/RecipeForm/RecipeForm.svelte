@@ -155,16 +155,19 @@
 							class="btn btn-outline btn-ghost justify-start">Create a new item</button
 						>
 					{:else}
-						<select required bind:value={recipeItem.id} class="select select-bordered">
+						<select
+							required
+							bind:value={recipeItem.id}
+							class="select select-bordered"
+							class:select-error={errors?.items?.[i]?.id?._errors}
+						>
 							{#each items as item}
-								<option
-									hidden={$form.items.some((i) => i.id === item.id && i.id !== recipeItem.id)}
-									value={item.id}
-								>
+								<option value={item.id}>
 									{item.name}
 								</option>
 							{/each}
 						</select>
+						<InputError errors={errors?.items?.[i]?.id?._errors} />
 					{/if}
 				</div>
 				<div class="form-control w-full">
@@ -176,8 +179,6 @@
 						required
 						name="amount"
 						type="number"
-						min="0.01"
-						step="0.01"
 						class="input input-bordered w-full"
 						class:input-error={errors?.items?.[i]?.amount?._errors}
 					/>

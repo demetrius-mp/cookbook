@@ -180,12 +180,50 @@ const recipeRouter = createProtectedRouter()
 		input: z.object({
 			id: z.string().optional(),
 			name: z.string().min(3),
-			items: z.array(
-				z.object({
-					id: z.string().uuid(),
-					amount: z.number().min(0.01)
+			items: z
+				.array(
+					z.object({
+						id: z.string().uuid(),
+						amount: z.number().min(0.01)
+					})
+				)
+				// .refine(
+				// 	(items) => {
+				// 		// const uniqueItems = uniqBy(items, 'id');
+				// 		// return uniqueItems.length === items.length;
+				// 		const result = items.map((o, i) => {
+				// 			const eq = items.find((e, ind) => {
+				// 				if (i > ind) {
+				// 					return e.id === o.id;
+				// 				}
+				// 			})
+
+				// 			return eq ? true : false
+				// 		})
+				// 	},
+				// 	{
+				// 		message: "You can't have duplicate items"
+				// 	}
+				// )
+				.superRefine((items, ctx) => {
+					items.map((o, i) => {
+						items.forEach((e, ind) => {
+							if (i > ind && e.id === o.id) {
+								ctx.addIssue({
+									code: 'custom',
+									path: [i, 'id'],
+									message: "You can't have duplicate items."
+								});
+
+								ctx.addIssue({
+									code: 'custom',
+									path: [ind, 'id'],
+									message: "You can't have duplicate items."
+								});
+							}
+						});
+					});
 				})
-			)
 		}),
 		resolve: async ({ input: { id, items, ...input }, ctx }) => {
 			if (id) {
