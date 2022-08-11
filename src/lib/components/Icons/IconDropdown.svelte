@@ -1,0 +1,10 @@
+<script lang="ts">
+	let klass = 'h-2 w-2';
+	export { klass as class };
+
+	$: classes = `${klass}`;
+</script>
+
+<svg class={classes} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048">
+	<path d="M1799 349l242 241-1017 1017L7 590l242-241 775 775 775-775z" />
+</svg>

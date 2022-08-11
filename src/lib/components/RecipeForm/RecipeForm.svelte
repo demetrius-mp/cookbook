@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Autocomplete from '$lib/components/Autocomplete/Autocomplete.svelte';
+	import IconX from '$lib/components/Icons/IconX.svelte';
 
 	import InputError from '$lib/components/InputError/InputError.svelte';
 	import ItemForm from '$lib/components/ItemForm/ItemForm.svelte';
@@ -131,20 +132,7 @@
 				<div class="flex justify-between">
 					<h2 class="card-title">Item {i + 1}</h2>
 					<button type="button" on:click={() => removeItem(i)} class="btn btn-square btn-sm">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							class="h-6 w-6"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M6 18L18 6M6 6l12 12"
-							/>
-						</svg>
+						<IconX />
 					</button>
 				</div>
 				<div class="form-control w-full">
