@@ -1,4 +1,7 @@
 <script lang="ts" context="module">
+	import BottomNavigation from '$lib/components/BottomNavigation/BottomNavigation.svelte';
+	import IconBookOpen from '$lib/components/Icons/IconBookOpen.svelte';
+	import IconShoppingBag from '$lib/components/Icons/IconShoppingBag.svelte';
 	import type { Load } from '@sveltejs/kit';
 
 	export const load: Load = ({ session }) => {
@@ -12,3 +15,18 @@
 </script>
 
 <slot />
+
+<BottomNavigation
+	navOptions={[
+		{
+			href: '/app/recipes',
+			label: 'Recipes',
+			icon: IconBookOpen
+		},
+		{
+			href: '/app/items',
+			label: 'Items',
+			icon: IconShoppingBag
+		}
+	]}
+/>

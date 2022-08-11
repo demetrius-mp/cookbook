@@ -9,7 +9,7 @@
 
 <div class="w-full navbar bg-base-200 lg:justify-end">
 	{#if $isDrawerLayoutStore}
-		<div class="flex-none lg:hidden">
+		<div class="flex-none hidden">
 			<button on:click={drawerStore.open} class="btn btn-square btn-ghost">
 				<IconMenu class="inline-block w-6 h-6 stroke-current" />
 			</button>
