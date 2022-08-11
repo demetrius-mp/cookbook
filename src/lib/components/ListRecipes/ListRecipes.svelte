@@ -3,8 +3,6 @@
 	import toastStore from '$lib/components/Toast/toast.store';
 	import trpcClient, { type InferMutationOutput, type InferQueryOutput } from '$lib/trpcClient';
 	import { goto } from '$app/navigation';
-	import { flip } from 'svelte/animate';
-	import { fade } from 'svelte/transition';
 	import IconTrash from '$lib/components/Icons/IconTrash.svelte';
 	import IconPencilAlt from '$lib/components/Icons/IconPencilAlt.svelte';
 	import IconDotsVertical from '$lib/components/Icons/IconDotsVertical.svelte';
@@ -16,6 +14,9 @@
 	import Pagination from '$lib/components/Pagination/Pagination.svelte';
 	import { createForm } from 'svelte-forms-lib';
 	import IconSearch from '$lib/components/Icons/IconSearch.svelte';
+	import overflow from '$lib/actions/overflow.action';
+	import { flip } from 'svelte/animate';
+	import { fade } from 'svelte/transition';
 
 	export let recipes: InferQueryOutput<'recipes:list'>;
 	export let viewType: 'own' | 'browsing' = 'browsing';
@@ -182,16 +183,16 @@
 			loading={$isSubmitting}
 		/>
 	</div>
-	<ul class:loading-state={$isSubmitting} class="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
+	<ul class:loading-state={$isSubmitting} class="grid grid-cols-1 sm:grid-cols-2 gap-6">
 		{#each computedRecipes as recipe (recipe.id)}
 			{@const liked = userLikedRecipe(recipe)}
 			<li
 				animate:flip={{ duration: 500 }}
-				transition:fade|local={{ duration: 300 }}
+				transition:fade={{ duration: 250 }}
 				class="col-span-1 flex flex-col rounded-lg"
 			>
-				<div class="card bg-base-200 shadow-xl overflow-visible">
-					<div class="card-body p-5">
+				<div class="card bg-base-200 shadow-xl h-96 overflow-visible">
+					<div class="card-body p-5 justify-evenly">
 						<div class="flex justify-between gap-3">
 							<h2 class="card-title">{recipe.name}</h2>
 							<div class="dropdown dropdown-end">
@@ -246,24 +247,26 @@
 							</div>
 						</div>
 						<div class="divider my-0" />
-						<ul>
-							{#each recipe.items as { item, amount, computedPrice }}
-								<li class="flex items-center justify-between">
-									<div class="flex flex-col">
-										<span class="text-lg">
-											- {item.name}
-										</span>
-										<span class="text-sm opacity-50">
-											{amount}
-											{item.amountKind}
-										</span>
-									</div>
-									<div>
-										{formatCurrency(computedPrice)}
-									</div>
-								</li>
-							{/each}
-						</ul>
+						<div class="max-h-44 overflow-y-auto">
+							<ul use:overflow={['mr-3']}>
+								{#each recipe.items as { item, amount, computedPrice }}
+									<li class="flex items-center justify-between">
+										<div class="flex flex-col">
+											<span class="text-lg">
+												- {item.name.repeat(3)}
+											</span>
+											<span class="text-sm opacity-50">
+												{amount}
+												{item.amountKind}
+											</span>
+										</div>
+										<div>
+											{formatCurrency(computedPrice)}
+										</div>
+									</li>
+								{/each}
+							</ul>
+						</div>
 						<div class="divider my-0" />
 						<div class="flex items-center justify-between">
 							<div class="text-2xl">Total:</div>
