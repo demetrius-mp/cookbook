@@ -170,7 +170,7 @@
 							idKey={'id'}
 							error={Boolean(errors?.items?.[i]?.id?._errors)}
 							searchFunction={async (query) => {
-								const { items } = await trpcClient(fetch).query('items:listForAutocomplete', {
+								const { items } = await trpcClient().query('items:listForAutocomplete', {
 									query
 								});
 

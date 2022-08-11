@@ -253,7 +253,7 @@
 									<li class="flex items-center justify-between">
 										<div class="flex flex-col">
 											<span class="text-lg">
-												- {item.name.repeat(3)}
+												- {item.name}
 											</span>
 											<span class="text-sm opacity-50">
 												{amount}
