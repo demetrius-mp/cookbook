@@ -202,7 +202,10 @@
 						<span class="label-text">
 							Amount
 							{#if recipeItem.id !== '' && recipeItem.amountUnit}
-								(in {recipeItem.amountUnit})
+								in
+								<span class="italic">
+									{recipeItem.amountUnit}
+								</span>
 							{/if}
 						</span>
 					</label>

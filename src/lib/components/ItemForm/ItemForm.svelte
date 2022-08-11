@@ -111,7 +111,11 @@
 			<span class="label-text">
 				Price
 				{#if $form.baseAmount > 0 && $form.amountUnit.trim() !== ''}
-					(per {$form.baseAmount} {$form.amountUnit})
+					per
+					<span class="italic">
+						{$form.baseAmount}
+						{$form.amountUnit}
+					</span>
 				{/if}
 			</span>
 		</label>
