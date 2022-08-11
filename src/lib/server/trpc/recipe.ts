@@ -245,7 +245,7 @@ const recipeRouter = createProtectedRouter()
 					};
 				});
 
-				const { itemsToCreate, itemsToDelete, itemsToUpdate } = getDiff(existingItems, items);
+				const { itemsToCreate, itemsToDelete, itemsToUpdate } = getDiff(existingItems, items, 'id');
 
 				const updatedRecipe = await prisma.recipe.update({
 					where: {

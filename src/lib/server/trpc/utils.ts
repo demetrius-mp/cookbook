@@ -35,16 +35,20 @@ export function getItemsToDelete<T>(existingItems: T[], newItems: T[]) {
 	return itemsToDelete;
 }
 
-export function getItemsToUpdate<T>(existingItems: T[], newItems: T[]) {
-	const itemsToUpdate = intersectionWith(newItems, existingItems, (a, b) => !isEqual(a, b));
+export function getItemsToUpdate<T>(existingItems: T[], newItems: T[], idKey: keyof T) {
+	const itemsToUpdate = intersectionWith(
+		newItems,
+		existingItems,
+		(a, b) => a[idKey] === b[idKey] && !isEqual(a, b)
+	);
 
 	return itemsToUpdate;
 }
 
-export function getDiff<T>(existingItems: T[], newItems: T[]) {
+export function getDiff<T>(existingItems: T[], newItems: T[], idKey: keyof T) {
 	const itemsToCreate = getItemsToCreate(existingItems, newItems);
 	const itemsToDelete = getItemsToDelete(existingItems, newItems);
-	const itemsToUpdate = getItemsToUpdate(existingItems, newItems);
+	const itemsToUpdate = getItemsToUpdate(existingItems, newItems, idKey);
 
 	return {
 		itemsToCreate,
