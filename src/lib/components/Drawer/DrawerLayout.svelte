@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { afterNavigate } from '$app/navigation';
-	import { session } from '$app/stores';
 	import drawerStore from '$lib/components/Drawer/drawer.store';
+	import isDrawerLayoutStore from '$lib/components/Drawer/isDrawerLayout.store';
 
 	afterNavigate(drawerStore.close);
 </script>
@@ -11,7 +11,7 @@
 	<div class="drawer-content flex flex-col">
 		<slot name="page content" />
 	</div>
-	{#if $session.user}
+	{#if $isDrawerLayoutStore}
 		<div class="drawer-side">
 			<label for="my-drawer" class="drawer-overlay" />
 			<slot name="drawer content" />
