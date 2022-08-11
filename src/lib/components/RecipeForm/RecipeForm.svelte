@@ -99,6 +99,7 @@
 	$: addNewItemButtonIsDisabled = $form.items.length === totalItems;
 
 	let newItemName = '';
+	let indexOfTheItemToReplace = -1;
 	let createNewItemModalIsOpen = false;
 	const openCreateNewItemModal = () => (createNewItemModalIsOpen = true);
 	const closeCreateNewItemModal = () => (createNewItemModalIsOpen = false);
@@ -197,6 +198,7 @@
 							}}
 							on:create={({ detail }) => {
 								newItemName = detail;
+								indexOfTheItemToReplace = i;
 								openCreateNewItemModal();
 							}}
 						/>
@@ -252,7 +254,19 @@
 				}}
 				on:submit={async ({ detail }) => {
 					closeCreateNewItemModal();
-					addItem(detail);
+					if (indexOfTheItemToReplace !== -1) {
+						const existingItem = $form.items[indexOfTheItemToReplace];
+						$form.items[indexOfTheItemToReplace] = {
+							...existingItem,
+							id: detail.id,
+							name: detail.name
+						};
+
+						indexOfTheItemToReplace = -1;
+					} else {
+						addItem(detail);
+					}
+
 					newItemName = '';
 				}}
 			/>
