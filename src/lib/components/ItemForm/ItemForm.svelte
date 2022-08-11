@@ -14,7 +14,7 @@
 	type SaveItem = InferMutationInput<'items:save'>;
 	type SaveItemError = ZodFormattedError<SaveItem>;
 
-	export let item: SaveItem = {
+	export let item: Partial<SaveItem> = {
 		amountKind: '',
 		baseAmount: 0,
 		name: '',
@@ -24,7 +24,13 @@
 	let errors: SaveItemError | undefined;
 
 	const { handleSubmit, form, isSubmitting, handleReset } = createForm<SaveItem>({
-		initialValues: item,
+		initialValues: {
+			id: item.id,
+			amountKind: item.amountKind || '',
+			baseAmount: item.baseAmount || 0,
+			name: item.name || '',
+			price: item.price || 0
+		},
 		onSubmit: async (values) => {
 			try {
 				const savedItem = await trpcClient().mutation('items:save', values);

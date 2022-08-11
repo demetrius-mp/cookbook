@@ -39,6 +39,8 @@ Recommended value: the output of the `openssl rand -hex 32` command.
 
 - Recipes and item deletions might not work properly due to referential integrity.
 
+- When creating an item using the `Create a new item` option in the autocomplete input, it will create a new entry on the recipe for the created item, instead of replacing the current one (if you created it from an entry that already had a value set).
+
 # Possible improvements
 
 - Use a modal instead of native js `confirm` to confirm delete and other critical actions.

@@ -1,5 +1,6 @@
 import prisma from '$lib/server/prisma';
 import { createProtectedRouter, filterByUserId } from '$lib/server/trpc/utils';
+import type { Prisma } from '@prisma/client';
 import * as trpc from '@trpc/server';
 import { z } from 'zod';
 
@@ -17,29 +18,98 @@ const itemRouter = createProtectedRouter()
 			return item;
 		}
 	})
+	.query('listForAutocomplete', {
+		input: z
+			.object({
+				query: z.string().optional(),
+				page: z.number().positive().default(1)
+			})
+			.default({
+				query: undefined,
+				page: 1
+			}),
+		resolve: async ({ ctx, input }) => {
+			const pageSize = 6;
+			const skip = (input.page - 1) * pageSize;
+			const take = pageSize;
+
+			const where: Prisma.ItemWhereInput = {
+				...filterByUserId(ctx.user.id),
+				name: {
+					contains: input.query,
+					mode: 'insensitive'
+				}
+			};
+
+			const [items, totalItems] = await prisma.$transaction([
+				prisma.item.findMany({
+					orderBy: {
+						name: 'asc'
+					},
+					select: {
+						id: true,
+						name: true
+					},
+					where,
+					skip,
+					take
+				}),
+				prisma.item.count({
+					where
+				})
+			]);
+
+			return {
+				items,
+				totalItems,
+				pageSize
+			};
+		}
+	})
 	.query('list', {
 		input: z
 			.object({
-				query: z.string().optional()
+				query: z.string().optional(),
+				page: z.number().positive().default(1),
+				isForAutocomplete: z.boolean().default(false)
 			})
 			.default({
-				query: undefined
+				query: undefined,
+				page: 1,
+				isForAutocomplete: false
 			}),
 		resolve: async ({ ctx, input }) => {
-			const items = await prisma.item.findMany({
-				orderBy: {
-					name: 'asc'
-				},
-				where: {
-					...filterByUserId(ctx.user.id),
-					name: {
-						contains: input.query,
-						mode: 'insensitive'
-					}
-				}
-			});
+			const pageSize = 6;
+			const skip = (input.page - 1) * pageSize;
+			const take = pageSize;
 
-			return items;
+			const where: Prisma.ItemWhereInput = {
+				...filterByUserId(ctx.user.id),
+				name: {
+					contains: input.query,
+					mode: 'insensitive'
+				}
+			};
+
+			const [items, totalItems] = await prisma.$transaction([
+				prisma.item.findMany({
+					orderBy: {
+						name: 'asc'
+					},
+					where,
+					skip,
+					take
+				}),
+				prisma.item.count({
+					where
+				})
+			]);
+
+			return {
+				items,
+				totalItems,
+				pageSize
+			};
 		}
 	})
 	.mutation('save', {

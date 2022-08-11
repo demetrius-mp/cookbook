@@ -1,6 +1,6 @@
 <script lang="ts" context="module">
 	export const load: Load = async ({ fetch }) => {
-		const items = await trpcClient(fetch).query('items:list');
+		const items = await trpcClient(fetch).query('items:listForAutocomplete');
 
 		return {
 			props: {
@@ -17,8 +17,12 @@
 	import trpcClient, { type InferQueryOutput } from '$lib/trpcClient';
 	import type { Load } from '@sveltejs/kit';
 
-	export let items: InferQueryOutput<'items:list'>;
+	export let items: InferQueryOutput<'items:listForAutocomplete'>;
 </script>
 
 <TitleWithGoBackIcon href="/app/recipes" title="New recipe" />
-<RecipeForm on:submit={() => goto('/app/recipes')} {items} />
+<RecipeForm
+	on:submit={() => goto('/app/recipes')}
+	items={items.items}
+	totalItems={items.totalItems}
+/>

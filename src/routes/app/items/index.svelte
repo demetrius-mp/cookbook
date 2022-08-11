@@ -14,15 +14,17 @@
 	import toastStore from '$lib/components/Toast/toast.store';
 
 	import { formatCurrency } from '$lib/utils/formatting.util';
-	import trpcClient from '$lib/trpcClient';
-	import type { Item } from '@prisma/client';
+	import trpcClient, { type InferQueryOutput } from '$lib/trpcClient';
 	import type { Load } from '@sveltejs/kit';
 	import { goto } from '$app/navigation';
 	import { TRPCClientError } from '@trpc/client';
 	import IconPencilAlt from '$lib/components/Icons/IconPencilAlt.svelte';
 	import IconTrash from '$lib/components/Icons/IconTrash.svelte';
+	import { createForm } from 'svelte-forms-lib';
+	import Pagination from '$lib/components/Pagination/Pagination.svelte';
+	import IconSearch from '$lib/components/Icons/IconSearch.svelte';
 
-	export let items: Item[];
+	export let items: InferQueryOutput<'items:list'>;
 
 	async function handleDeleteItem(id: string) {
 		const confirmDelete = confirm('Are you sure you want to delete this item?');
@@ -52,6 +54,19 @@
 	async function handleEditItem(id: string) {
 		await goto(`/app/items/${id}/edit`);
 	}
+
+	const { form, isSubmitting, handleSubmit } = createForm({
+		initialValues: {
+			query: '',
+			currentPage: 1
+		},
+		onSubmit: async (values) => {
+			items = await trpcClient().query('items:list', {
+				page: values.currentPage,
+				query: values.query
+			});
+		}
+	});
 </script>
 
 <div class="flex justify-between items-center mb-5 gap-3">
@@ -61,6 +76,34 @@
 	<div class="">
 		<a class="btn btn-primary w-full" href="/app/items/new">+ New item</a>
 	</div>
+</div>
+
+<form on:submit={handleSubmit} class="w-full mb-5">
+	<div class="form-control">
+		<div class="input-group">
+			<input
+				type="search"
+				bind:value={$form.query}
+				placeholder="Search…"
+				class="input input-bordered w-full"
+			/>
+			<button type="submit" class:loading={$isSubmitting} class="btn btn-square">
+				{#if !$isSubmitting}
+					<IconSearch />
+				{/if}
+			</button>
+		</div>
+	</div>
+</form>
+
+<div class="mb-3">
+	<Pagination
+		pageSize={items.pageSize}
+		totalItems={items.totalItems}
+		loading={$isSubmitting}
+		bind:currentPage={$form.currentPage}
+		on:pageChange={handleSubmit}
+	/>
 </div>
 
 <div class="overflow-x-auto w-full rounded-lg shadow-lg ring-base-300">
@@ -73,8 +116,8 @@
 			</tr>
 		</thead>
 
-		<tbody>
-			{#each items as item (item.id)}
+		<tbody class:loading-state={$isSubmitting}>
+			{#each items.items as item (item.id)}
 				<tr>
 					<td class="font-bold">
 						{item.name}

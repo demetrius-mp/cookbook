@@ -52,7 +52,7 @@ const recipeRouter = createProtectedRouter()
 				page: 1
 			}),
 		resolve: async ({ ctx, input }) => {
-			const pageSize = 6;
+			const pageSize = 2;
 			const skip = (input.page - 1) * pageSize;
 			const take = pageSize;
 
@@ -187,24 +187,6 @@ const recipeRouter = createProtectedRouter()
 						amount: z.number().min(0.01)
 					})
 				)
-				// .refine(
-				// 	(items) => {
-				// 		// const uniqueItems = uniqBy(items, 'id');
-				// 		// return uniqueItems.length === items.length;
-				// 		const result = items.map((o, i) => {
-				// 			const eq = items.find((e, ind) => {
-				// 				if (i > ind) {
-				// 					return e.id === o.id;
-				// 				}
-				// 			})
-
-				// 			return eq ? true : false
-				// 		})
-				// 	},
-				// 	{
-				// 		message: "You can't have duplicate items"
-				// 	}
-				// )
 				.superRefine((items, ctx) => {
 					items.map((o, i) => {
 						items.forEach((e, ind) => {

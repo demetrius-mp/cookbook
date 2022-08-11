@@ -1,4 +1,6 @@
 <script lang="ts">
+	import Autocomplete from '$lib/components/Autocomplete/Autocomplete.svelte';
+
 	import InputError from '$lib/components/InputError/InputError.svelte';
 	import ItemForm from '$lib/components/ItemForm/ItemForm.svelte';
 
@@ -9,24 +11,37 @@
 	import { createForm } from 'svelte-forms-lib';
 	import type { ZodFormattedError } from 'zod';
 
-	type Item = InferQueryOutput<'items:list'>[number];
-	export let items: Item[] = [];
+	export let items: InferQueryOutput<'items:listForAutocomplete'>['items'];
+	export let totalItems: number;
 
 	type SaveRecipe = InferMutationInput<'recipes:save'>;
-	export let recipe: SaveRecipe = {
-		name: '',
-		items: [makeNewItem()]
+	type RecipeForm = Omit<SaveRecipe, 'items'> & {
+		items: Array<
+			SaveRecipe['items'][number] & {
+				name: string;
+			}
+		>;
 	};
 
-	type SaveItemErrors = ZodFormattedError<SaveRecipe>;
+	export let recipe: InferQueryOutput<'recipes:findById'> = null;
+
+	let recipeForm: RecipeForm = {
+		id: recipe?.id || '',
+		name: recipe?.name || '',
+		items: recipe?.items.map((i) => ({ amount: i.amount, id: i.item.id, name: i.item.name })) || [
+			makeNewItem()
+		]
+	};
+
+	type SaveItemErrors = ZodFormattedError<RecipeForm>;
 	let errors: SaveItemErrors | undefined;
 
 	const dispatch = createEventDispatcher<{
 		submit: void;
 	}>();
 
-	const { form, handleSubmit, handleReset, isSubmitting } = createForm<SaveRecipe>({
-		initialValues: recipe,
+	const { form, handleSubmit, handleReset, isSubmitting } = createForm<RecipeForm>({
+		initialValues: recipeForm,
 		onSubmit: async (values) => {
 			try {
 				await trpcClient().mutation('recipes:save', values);
@@ -51,29 +66,20 @@
 		}
 	});
 
-	function makeNewItem(selectedId?: string): SaveRecipe['items'][number] {
-		const itemToUseId =
-			items.find((v) => {
-				return $form && $form.items.length > 0 && !$form.items.some((item) => item.id === v.id);
-			}) ||
-			(items && items[0]) ||
-			'';
-
-		const id = selectedId !== undefined ? selectedId : itemToUseId.id;
-
+	function makeNewItem(item?: { id: string; name: string }): RecipeForm['items'][number] {
 		return {
 			amount: 0,
-			id
+			name: item?.name || '',
+			id: item?.id || ''
 		};
 	}
 
-	let addNewItemButtonIsDisabled = recipe.items.length === items.length;
-	function addItem(selectedId?: string) {
-		if ($form.items.length === items.length) {
+	function addItem(item?: { id: string; name: string }) {
+		if ($form.items.length === totalItems) {
 			return;
 		}
 
-		$form.items = [...$form.items, makeNewItem(selectedId)];
+		$form.items = [...$form.items, makeNewItem(item)];
 	}
 
 	function removeItem(index: number) {
@@ -90,8 +96,9 @@
 		$form.items = $form.items.filter((_, i) => i !== index);
 	}
 
-	$: addNewItemButtonIsDisabled = $form.items.length === items.length;
+	$: addNewItemButtonIsDisabled = $form.items.length === totalItems;
 
+	let newItemName = '';
 	let createNewItemModalIsOpen = false;
 	const openCreateNewItemModal = () => (createNewItemModalIsOpen = true);
 	const closeCreateNewItemModal = () => (createNewItemModalIsOpen = false);
@@ -117,7 +124,7 @@
 		<InputError errors={errors?.name?._errors} />
 	</div>
 	<div class="divider" />
-	<div class="card bg-base-200 w-full shadow-xl mb-4">
+	<div class="card overflow-visible bg-base-200 w-full shadow-xl mb-4">
 		<div class="card-body p-5">
 			{#each $form.items as recipeItem, i}
 				<div class="flex justify-between">
@@ -155,18 +162,44 @@
 							class="btn btn-outline btn-ghost justify-start">Create a new item</button
 						>
 					{:else}
-						<select
-							required
-							bind:value={recipeItem.id}
-							class="select select-bordered"
-							class:select-error={errors?.items?.[i]?.id?._errors}
-						>
-							{#each items as item}
-								<option value={item.id}>
-									{item.name}
-								</option>
-							{/each}
-						</select>
+						<Autocomplete
+							selected={recipeItem}
+							options={items.map((i) => ({ name: i.name, id: i.id }))}
+							getLabel={(i) => i.name}
+							idKey={'id'}
+							error={Boolean(errors?.items?.[i]?.id?._errors)}
+							searchFunction={async (query) => {
+								const { items } = await trpcClient(fetch).query('items:listForAutocomplete', {
+									query
+								});
+
+								return items;
+							}}
+							on:select={({ detail }) => {
+								const itemAlreadyExistsInThisRecipe = $form.items.some(
+									(item, idx) => idx !== i && item.id === detail.id
+								);
+
+								if (itemAlreadyExistsInThisRecipe) {
+									toastStore.push({
+										kind: 'error',
+										message: "You can't have duplicate items.",
+										removeAfter: 3000
+									});
+									return;
+								}
+
+								recipeItem = {
+									...recipeItem,
+									id: detail.id,
+									name: detail.name
+								};
+							}}
+							on:create={({ detail }) => {
+								newItemName = detail;
+								openCreateNewItemModal();
+							}}
+						/>
 						<InputError errors={errors?.items?.[i]?.id?._errors} />
 					{/if}
 				</div>
@@ -212,12 +245,17 @@
 />
 <label for="createNewItemModal" class="modal cursor-pointer">
 	<label for="" class="modal-box relative">
-		<ItemForm
-			on:submit={async ({ detail }) => {
-				closeCreateNewItemModal();
-				items = await trpcClient().query('items:list');
-				addItem(detail.id);
-			}}
-		/>
+		{#key newItemName}
+			<ItemForm
+				item={{
+					name: newItemName
+				}}
+				on:submit={async ({ detail }) => {
+					closeCreateNewItemModal();
+					addItem(detail);
+					newItemName = '';
+				}}
+			/>
+		{/key}
 	</label>
 </label>
