@@ -160,7 +160,7 @@
 				on:blur={() => (status = 'blur')}
 			/>
 		{/key}
-		{#if optionsMenuIsOpen}
+		{#if optionsMenuIsOpen || (options.length === 0 && currentInputValue.trim() !== '')}
 			<ul
 				class="absolute z-50 menu bg-base-300 gap-1 p-2 rounded-box overflow-y-auto w-full mt-2"
 				id="listbox-1"

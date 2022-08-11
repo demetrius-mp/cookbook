@@ -20,6 +20,7 @@
 		items: Array<
 			SaveRecipe['items'][number] & {
 				name: string;
+				amountUnit: string;
 			}
 		>;
 	};
@@ -29,9 +30,12 @@
 	let recipeForm: RecipeForm = {
 		id: recipe?.id || '',
 		name: recipe?.name || '',
-		items: recipe?.items.map((i) => ({ amount: i.amount, id: i.item.id, name: i.item.name })) || [
-			makeNewItem()
-		]
+		items: recipe?.items.map((i) => ({
+			amount: i.amount,
+			id: i.item.id,
+			name: i.item.name,
+			amountUnit: i.item.amountUnit
+		})) || [makeNewItem()]
 	};
 
 	type SaveItemErrors = ZodFormattedError<RecipeForm>;
@@ -67,16 +71,23 @@
 		}
 	});
 
-	function makeNewItem(item?: { id: string; name: string }): RecipeForm['items'][number] {
+	function makeNewItem(item?: typeof items[number]): RecipeForm['items'][number] {
 		return {
 			amount: 0,
 			name: item?.name || '',
-			id: item?.id || ''
+			id: item?.id || '',
+			amountUnit: item?.amountUnit || ''
 		};
 	}
 
-	function addItem(item?: { id: string; name: string }) {
+	function addItem(item?: typeof items[number]) {
 		if ($form.items.length === totalItems) {
+			return;
+		}
+
+		if ($form.items[0].id === '') {
+			$form.items = [makeNewItem(item)];
+
 			return;
 		}
 
@@ -144,58 +155,56 @@
 							</button>
 						</span>
 					</label>
-					{#if items.length === 0}
-						<button
-							type="button"
-							on:click={openCreateNewItemModal}
-							class="btn btn-outline btn-ghost justify-start">Create a new item</button
-						>
-					{:else}
-						<Autocomplete
-							selected={recipeItem}
-							options={items.map((i) => ({ name: i.name, id: i.id }))}
-							getLabel={(i) => i.name}
-							idKey={'id'}
-							error={Boolean(errors?.items?.[i]?.id?._errors)}
-							searchFunction={async (query) => {
-								const { items } = await trpcClient().query('items:listForAutocomplete', {
-									query
+					<Autocomplete
+						selected={recipeItem}
+						options={items.map((i) => ({ name: i.name, id: i.id, amountUnit: i.amountUnit }))}
+						getLabel={(i) => i.name}
+						idKey={'id'}
+						error={Boolean(errors?.items?.[i]?.id?._errors)}
+						searchFunction={async (query) => {
+							const { items } = await trpcClient().query('items:listForAutocomplete', {
+								query
+							});
+
+							return items;
+						}}
+						on:select={({ detail }) => {
+							const itemAlreadyExistsInThisRecipe = $form.items.some(
+								(item, idx) => idx !== i && item.id === detail.id
+							);
+
+							if (itemAlreadyExistsInThisRecipe) {
+								toastStore.push({
+									kind: 'error',
+									message: "You can't have duplicate items.",
+									removeAfter: 3000
 								});
+								return;
+							}
 
-								return items;
-							}}
-							on:select={({ detail }) => {
-								const itemAlreadyExistsInThisRecipe = $form.items.some(
-									(item, idx) => idx !== i && item.id === detail.id
-								);
-
-								if (itemAlreadyExistsInThisRecipe) {
-									toastStore.push({
-										kind: 'error',
-										message: "You can't have duplicate items.",
-										removeAfter: 3000
-									});
-									return;
-								}
-
-								recipeItem = {
-									...recipeItem,
-									id: detail.id,
-									name: detail.name
-								};
-							}}
-							on:create={({ detail }) => {
-								newItemName = detail;
-								indexOfTheItemToReplace = i;
-								openCreateNewItemModal();
-							}}
-						/>
-						<InputError errors={errors?.items?.[i]?.id?._errors} />
-					{/if}
+							recipeItem = {
+								...recipeItem,
+								id: detail.id,
+								name: detail.name,
+								amountUnit: detail.amountUnit
+							};
+						}}
+						on:create={({ detail }) => {
+							newItemName = detail;
+							indexOfTheItemToReplace = i;
+							openCreateNewItemModal();
+						}}
+					/>
+					<InputError errors={errors?.items?.[i]?.id?._errors} />
 				</div>
 				<div class="form-control w-full">
 					<label for="items[{i}].amount" class="label">
-						<span class="label-text">Amount</span>
+						<span class="label-text">
+							Amount
+							{#if recipeItem.id !== '' && recipeItem.amountUnit}
+								(in {recipeItem.amountUnit})
+							{/if}
+						</span>
 					</label>
 					<input
 						bind:value={recipeItem.amount}
@@ -246,8 +255,7 @@
 						const existingItem = $form.items[indexOfTheItemToReplace];
 						$form.items[indexOfTheItemToReplace] = {
 							...existingItem,
-							id: detail.id,
-							name: detail.name
+							...detail
 						};
 
 						indexOfTheItemToReplace = -1;
@@ -255,6 +263,8 @@
 						addItem(detail);
 					}
 
+					// totalItems += 1;
+					// items = [...items, detail];
 					newItemName = '';
 				}}
 			/>

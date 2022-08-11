@@ -128,7 +128,7 @@
 								<div>{formatCurrency(item.price)}</div>
 								<div class="text-sm opacity-50">
 									{item.baseAmount}
-									{item.amountKind}
+									{item.amountUnit}
 								</div>
 							</div>
 						</div>

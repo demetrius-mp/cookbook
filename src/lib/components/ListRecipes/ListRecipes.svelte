@@ -257,7 +257,7 @@
 											</span>
 											<span class="text-sm opacity-50">
 												{amount}
-												{item.amountKind}
+												{item.amountUnit}
 											</span>
 										</div>
 										<div>

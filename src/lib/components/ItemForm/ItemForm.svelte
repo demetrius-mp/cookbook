@@ -15,7 +15,7 @@
 	type SaveItemError = ZodFormattedError<SaveItem>;
 
 	export let item: Partial<SaveItem> = {
-		amountKind: '',
+		amountUnit: '',
 		baseAmount: 0,
 		name: '',
 		price: 0
@@ -26,7 +26,7 @@
 	const { handleSubmit, form, isSubmitting, handleReset } = createForm<SaveItem>({
 		initialValues: {
 			id: item.id,
-			amountKind: item.amountKind || '',
+			amountUnit: item.amountUnit || '',
 			baseAmount: item.baseAmount || 0,
 			name: item.name || '',
 			price: item.price || 0
@@ -92,23 +92,28 @@
 	</div>
 
 	<div class="form-control w-full">
-		<label for="amountKind" class="label">
-			<span class="label-text">Amount kind</span>
+		<label for="amountUnit" class="label">
+			<span class="label-text">Amount unit (grams, ml, tbsp)</span>
 		</label>
 		<input
-			bind:value={$form.amountKind}
+			bind:value={$form.amountUnit}
 			required
-			name="amountKind"
+			name="amountUnit"
 			type="text"
 			class="input input-bordered w-full"
-			class:input-error={errors?.amountKind?._errors}
+			class:input-error={errors?.amountUnit?._errors}
 		/>
-		<InputError errors={errors?.amountKind?._errors} />
+		<InputError errors={errors?.amountUnit?._errors} />
 	</div>
 
 	<div class="form-control w-full">
 		<label for="price" class="label">
-			<span class="label-text">Price</span>
+			<span class="label-text">
+				Price
+				{#if $form.baseAmount > 0 && $form.amountUnit.trim() !== ''}
+					(per {$form.baseAmount} {$form.amountUnit})
+				{/if}
+			</span>
 		</label>
 		<input
 			bind:value={$form.price}

@@ -48,7 +48,8 @@ const itemRouter = createProtectedRouter()
 					},
 					select: {
 						id: true,
-						name: true
+						name: true,
+						amountUnit: true
 					},
 					where,
 					skip,
@@ -117,7 +118,7 @@ const itemRouter = createProtectedRouter()
 			id: z.string().uuid().optional(),
 			name: z.string().min(3),
 			baseAmount: z.number().int().min(1),
-			amountKind: z.string(),
+			amountUnit: z.string(),
 			price: z.number().min(0.01)
 		}),
 		resolve: async ({ input: { id, ...data }, ctx }) => {
