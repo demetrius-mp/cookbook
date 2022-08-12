@@ -3,7 +3,7 @@
 	import { createEventDispatcher } from 'svelte';
 	import { createForm } from 'svelte-forms-lib';
 	import type { ZodFormattedError } from 'zod';
-	
+
 	import InputError from '$lib/components/Forms/InputError/InputError.svelte';
 	import toastStore from '$lib/components/Toast/toast.store';
 	import trpcClient, { type InferMutationInput, type InferMutationOutput } from '$lib/trpcClient';
@@ -60,13 +60,13 @@
 	class="flex flex-col gap-3 items-center justify-center"
 >
 	<div class="form-control w-full">
-		<label for="name" class="label">
+		<label for="itemName" class="label">
 			<span class="label-text">Name</span>
 		</label>
 		<input
 			bind:value={$form.name}
 			required
-			name="name"
+			name="itemName"
 			type="text"
 			min="3"
 			class="input input-bordered w-full"
