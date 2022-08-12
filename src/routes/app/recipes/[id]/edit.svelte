@@ -8,8 +8,12 @@
 		const items = await trpcClient(fetch).query('items:listForAutocomplete');
 
 		if (!recipe) {
+			const queryParams = qs.stringify({
+				redirectReason: 'The recipe does not exist.'
+			});
+
 			return {
-				redirect: '/app/recipes',
+				redirect: `/app/recipes?${queryParams}`,
 				status: 302
 			};
 		}
@@ -25,7 +29,8 @@
 
 <script lang="ts">
 	import type { Load } from '@sveltejs/kit';
-	
+	import qs from 'query-string';
+
 	import { goto } from '$app/navigation';
 	import RecipeForm from '$lib/components/Forms/RecipeForm/RecipeForm.svelte';
 	import { TitleWithGoBackIcon } from '$lib/components/Navigation';

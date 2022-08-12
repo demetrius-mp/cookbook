@@ -195,7 +195,13 @@
 				<div class="card bg-base-200 shadow-xl h-96 overflow-visible">
 					<div class="card-body p-5 justify-evenly">
 						<div class="flex justify-between gap-3">
-							<h2 class="card-title">{recipe.name}</h2>
+							<h2 class="card-title">
+								{#if viewType === 'own'}
+									<a class="link" href="/app/recipes/{recipe.id}/edit">{recipe.name}</a>
+								{:else}
+									{recipe.name}
+								{/if}
+							</h2>
 							<div class="dropdown dropdown-end">
 								<label for="dropdown" tabindex="0" class="btn btn-sm btn-square">
 									<IconDotsVertical />

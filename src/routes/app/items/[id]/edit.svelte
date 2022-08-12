@@ -3,8 +3,12 @@
 		const item = await trpcClient(fetch).query('items:findById', params.id);
 
 		if (!item) {
+			const queryParams = qs.stringify({
+				redirectReason: 'The item does not exist.'
+			});
+
 			return {
-				redirect: '/app/items',
+				redirect: `/app/items?${queryParams}`,
 				status: 302
 			};
 		}
@@ -19,7 +23,8 @@
 
 <script lang="ts">
 	import type { Load } from '@sveltejs/kit';
-	
+	import qs from 'query-string';
+
 	import { goto } from '$app/navigation';
 	import ItemForm from '$lib/components/Forms/ItemForm/ItemForm.svelte';
 	import { TitleWithGoBackIcon } from '$lib/components/Navigation';
