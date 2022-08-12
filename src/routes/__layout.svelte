@@ -4,8 +4,8 @@
 	import Container from '$lib/components/Container/Container.svelte';
 	import DrawerContent from '$lib/components/Drawer/DrawerContent.svelte';
 	import DrawerLayout from '$lib/components/Drawer/DrawerLayout.svelte';
-	import Navbar from '$lib/components/Navbar/Navbar.svelte';
-	import PageLoader from '$lib/components/PageLoader/PageLoader.svelte';
+	import { Navbar } from '$lib/components/Navigation';
+	import { PageLoader } from '$lib/components/Navigation';
 	import toastStore from '$lib/components/Toast/toast.store';
 	import ToastContainer from '$lib/components/Toast/ToastContainer.svelte';
 	import qs from 'query-string';

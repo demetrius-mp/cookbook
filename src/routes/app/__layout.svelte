@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-	import BottomNavigation from '$lib/components/BottomNavigation/BottomNavigation.svelte';
+	import { BottomNavigation } from '$lib/components/Navigation/';
 	import IconBookOpen from '$lib/components/Icons/IconBookOpen.svelte';
 	import IconShoppingBag from '$lib/components/Icons/IconShoppingBag.svelte';
 	import type { Load } from '@sveltejs/kit';

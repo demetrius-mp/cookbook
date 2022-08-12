@@ -11,7 +11,7 @@
 	import IconClipboard from '$lib/components/Icons/IconClipboard.svelte';
 	import IconHeart from '$lib/components/Icons/IconHeart.svelte';
 	import { createEventDispatcher } from 'svelte';
-	import Pagination from '$lib/components/Pagination/Pagination.svelte';
+	import { Pagination } from '$lib/components/Navigation';
 	import { createForm } from 'svelte-forms-lib';
 	import IconSearch from '$lib/components/Icons/IconSearch.svelte';
 	import overflow from '$lib/actions/overflow.action';

@@ -12,8 +12,8 @@
 
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import RecipeForm from '$lib/components/RecipeForm/RecipeForm.svelte';
-	import TitleWithGoBackIcon from '$lib/components/TitleWithGoBackIcon/TitleWithGoBackIcon.svelte';
+	import RecipeForm from '$lib/components/Forms/RecipeForm/RecipeForm.svelte';
+	import { TitleWithGoBackIcon } from '$lib/components/Navigation';
 	import trpcClient, { type InferQueryOutput } from '$lib/trpcClient';
 	import type { Load } from '@sveltejs/kit';
 

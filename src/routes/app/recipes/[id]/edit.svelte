@@ -26,9 +26,9 @@
 <script lang="ts">
 	import type { Load } from '@sveltejs/kit';
 	import trpcClient, { type InferQueryOutput } from '$lib/trpcClient';
-	import RecipeForm from '$lib/components/RecipeForm/RecipeForm.svelte';
+	import RecipeForm from '$lib/components/Forms/RecipeForm/RecipeForm.svelte';
 	import { goto } from '$app/navigation';
-	import TitleWithGoBackIcon from '$lib/components/TitleWithGoBackIcon/TitleWithGoBackIcon.svelte';
+	import { TitleWithGoBackIcon } from '$lib/components/Navigation';
 
 	export let recipe: InferQueryOutput<'recipes:findById'>;
 	export let items: InferQueryOutput<'items:listForAutocomplete'>;

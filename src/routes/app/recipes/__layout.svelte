@@ -1,5 +1,5 @@
 <script lang="ts">
-	import TabsNavigation from '$lib/components/TabsNavigation/TabsNavigation.svelte';
+	import { TabsNavigation } from '$lib/components/Navigation';
 </script>
 
 <TabsNavigation

@@ -3,7 +3,7 @@
 	import trpcClient, { type InferMutationInput } from '$lib/trpcClient';
 	import { createForm } from 'svelte-forms-lib';
 	import { TRPCClientError } from '@trpc/client';
-	import InputError from '$lib/components/InputError/InputError.svelte';
+	import InputError from '$lib/components/Forms/InputError/InputError.svelte';
 	import type { ZodFormattedError } from 'zod';
 	import { goto } from '$app/navigation';
 	import { session } from '$app/stores';

@@ -1,12 +1,11 @@
 <script lang="ts">
-	import Autocomplete from '$lib/components/Autocomplete/Autocomplete.svelte';
+	import Autocomplete from '$lib/components/Forms/Autocomplete/Autocomplete.svelte';
 	import IconX from '$lib/components/Icons/IconX.svelte';
-
-	import InputError from '$lib/components/InputError/InputError.svelte';
-	import ItemForm from '$lib/components/ItemForm/ItemForm.svelte';
-
+	import InputError from '$lib/components/Forms/InputError/InputError.svelte';
+	import ItemForm from '$lib/components/Forms/ItemForm/ItemForm.svelte';
 	import toastStore from '$lib/components/Toast/toast.store';
 	import trpcClient, { type InferMutationInput, type InferQueryOutput } from '$lib/trpcClient';
+
 	import { TRPCClientError } from '@trpc/client';
 	import { createEventDispatcher } from 'svelte';
 	import { createForm } from 'svelte-forms-lib';

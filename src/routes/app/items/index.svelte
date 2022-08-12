@@ -21,7 +21,7 @@
 	import IconPencilAlt from '$lib/components/Icons/IconPencilAlt.svelte';
 	import IconTrash from '$lib/components/Icons/IconTrash.svelte';
 	import { createForm } from 'svelte-forms-lib';
-	import Pagination from '$lib/components/Pagination/Pagination.svelte';
+	import { Pagination } from '$lib/components/Navigation';
 	import IconSearch from '$lib/components/Icons/IconSearch.svelte';
 
 	export let items: InferQueryOutput<'items:list'>;

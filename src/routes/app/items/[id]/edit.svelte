@@ -20,9 +20,9 @@
 <script lang="ts">
 	import type { Load } from '@sveltejs/kit';
 	import trpcClient, { type InferQueryOutput } from '$lib/trpcClient';
-	import ItemForm from '$lib/components/ItemForm/ItemForm.svelte';
+	import ItemForm from '$lib/components/Forms/ItemForm/ItemForm.svelte';
 	import { goto } from '$app/navigation';
-	import TitleWithGoBackIcon from '$lib/components/TitleWithGoBackIcon/TitleWithGoBackIcon.svelte';
+	import { TitleWithGoBackIcon } from '$lib/components/Navigation';
 
 	type SaveItem = InferQueryOutput<'items:findById'>;
 	export let item: SaveItem;
