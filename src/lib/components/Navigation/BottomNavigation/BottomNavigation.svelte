@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { SvelteComponent } from 'svelte';
-	
+
 	import { page } from '$app/stores';
 
 	interface BottomNavigationOption {
@@ -12,7 +12,7 @@
 	export let navOptions: BottomNavigationOption[] = [];
 </script>
 
-<div class="btm-nav btm-nav-md lg:hidden bg-base-300">
+<div class="btm-nav btm-nav-sm lg:hidden bg-base-300">
 	{#each navOptions as { label, href, icon } (href)}
 		<a {href} class:active={$page.url.pathname.startsWith(href)} class="bg-base-300">
 			<!-- <IconBookOpen class="h-5 w-5" /> -->
