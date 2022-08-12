@@ -1,9 +1,10 @@
-import { browser } from '$app/env';
-import type { Router } from '$lib/server/trpc';
 import type { LoadEvent } from '@sveltejs/kit';
 import * as trpc from '@trpc/client';
 import type { inferProcedureInput, inferProcedureOutput } from '@trpc/server';
 import trpcTransformer from 'trpc-transformer';
+
+import { browser } from '$app/env';
+import type { Router } from '$lib/server/trpc';
 
 const url = browser ? '/trpc' : 'http://127.0.0.1:5173/trpc';
 

@@ -15,8 +15,9 @@
 
 <script lang="ts">
 	import type { Load } from '@sveltejs/kit';
-	import trpcClient, { type InferQueryOutput } from '$lib/trpcClient';
+	
 	import ListRecipes from '$lib/components/ListRecipes/ListRecipes.svelte';
+	import trpcClient, { type InferQueryOutput } from '$lib/trpcClient';
 
 	export let recipes: InferQueryOutput<'recipes:list'>;
 

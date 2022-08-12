@@ -1,7 +1,8 @@
 import type { User } from '@prisma/client';
 import bcrypt from 'bcrypt';
-import jwt, { type VerifyOptions } from 'jsonwebtoken';
 import { parse } from 'cookie';
+import jwt, { type VerifyOptions } from 'jsonwebtoken';
+
 import prisma from '$lib/server/prisma';
 
 export type JwtPayloadType = {

@@ -1,14 +1,15 @@
 <script lang="ts">
-	import toastStore from '$lib/components/Toast/toast.store';
-	import trpcClient, { type InferMutationInput } from '$lib/trpcClient';
-	import { createForm } from 'svelte-forms-lib';
 	import { TRPCClientError } from '@trpc/client';
-	import InputError from '$lib/components/Forms/InputError/InputError.svelte';
+	import { MD5 } from 'crypto-js';
+	import { createForm } from 'svelte-forms-lib';
 	import type { ZodFormattedError } from 'zod';
+	
 	import { goto } from '$app/navigation';
 	import { session } from '$app/stores';
-	import { MD5 } from 'crypto-js';
+	import InputError from '$lib/components/Forms/InputError/InputError.svelte';
 	import IconInformationCircle from '$lib/components/Icons/IconInformationCircle.svelte';
+	import toastStore from '$lib/components/Toast/toast.store';
+	import trpcClient, { type InferMutationInput } from '$lib/trpcClient';
 
 	type UpdateUser = InferMutationInput<'users:update'>;
 	type UpdateUserError = ZodFormattedError<UpdateUser>;

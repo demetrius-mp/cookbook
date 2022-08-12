@@ -2,7 +2,7 @@ module.exports = {
 	root: true,
 	parser: '@typescript-eslint/parser',
 	extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended', 'prettier'],
-	plugins: ['svelte3', '@typescript-eslint'],
+	plugins: ['svelte3', '@typescript-eslint', 'simple-import-sort'],
 	ignorePatterns: ['*.cjs'],
 	overrides: [{ files: ['*.svelte'], processor: 'svelte3/svelte3' }],
 	settings: {
@@ -18,6 +18,8 @@ module.exports = {
 		node: true
 	},
 	rules: {
-		'@typescript-eslint/no-unused-vars': ['error', { ignoreRestSiblings: true }]
+		'@typescript-eslint/no-unused-vars': ['error', { ignoreRestSiblings: true }],
+		'simple-import-sort/imports': 'error',
+		'simple-import-sort/exports': 'error'
 	}
 };

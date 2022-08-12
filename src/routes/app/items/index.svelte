@@ -11,18 +11,18 @@
 </script>
 
 <script lang="ts">
-	import toastStore from '$lib/components/Toast/toast.store';
-
-	import { formatCurrency } from '$lib/utils/formatting.util';
-	import trpcClient, { type InferQueryOutput } from '$lib/trpcClient';
 	import type { Load } from '@sveltejs/kit';
-	import { goto } from '$app/navigation';
 	import { TRPCClientError } from '@trpc/client';
-	import IconPencilAlt from '$lib/components/Icons/IconPencilAlt.svelte';
-	import IconTrash from '$lib/components/Icons/IconTrash.svelte';
 	import { createForm } from 'svelte-forms-lib';
-	import { Pagination } from '$lib/components/Navigation';
+	
+	import { goto } from '$app/navigation';
+	import IconPencilAlt from '$lib/components/Icons/IconPencilAlt.svelte';
 	import IconSearch from '$lib/components/Icons/IconSearch.svelte';
+	import IconTrash from '$lib/components/Icons/IconTrash.svelte';
+	import { Pagination } from '$lib/components/Navigation';
+	import toastStore from '$lib/components/Toast/toast.store';
+	import trpcClient, { type InferQueryOutput } from '$lib/trpcClient';
+	import { formatCurrency } from '$lib/utils/formatting.util';
 
 	export let items: InferQueryOutput<'items:list'>;
 

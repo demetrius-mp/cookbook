@@ -1,9 +1,10 @@
-import { createContext, router } from '$lib/server/trpc';
-import { createTRPCHandle } from 'trpc-sveltekit';
-import { getThemeFromCookies } from '$lib/utils/theme.util';
 import type { GetSession, Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
+import { createTRPCHandle } from 'trpc-sveltekit';
+
+import { createContext, router } from '$lib/server/trpc';
 import { getUserFromCookies } from '$lib/utils/auth.util';
+import { getThemeFromCookies } from '$lib/utils/theme.util';
 
 const handleCookies: Handle = async ({ event, resolve }) => {
 	const cookiesString = event.request.headers.get('cookie') || '';

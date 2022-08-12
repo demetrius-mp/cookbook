@@ -1,11 +1,12 @@
-import prisma from '$lib/server/prisma';
-import * as trpc from '@trpc/server';
-import { z } from 'zod';
-import cookie from 'cookie';
-import AuthService from '$lib/utils/auth.util';
 import type { inferAsyncReturnType } from '@trpc/server';
-import type { createContext } from '$lib/server/trpc';
+import * as trpc from '@trpc/server';
+import cookie from 'cookie';
 import { createHash } from 'node:crypto';
+import { z } from 'zod';
+
+import prisma from '$lib/server/prisma';
+import type { createContext } from '$lib/server/trpc';
+import AuthService from '$lib/utils/auth.util';
 
 function generateGravatarUrl(email: string) {
 	const hashedEmail = createHash('md5').update(email).digest('hex');

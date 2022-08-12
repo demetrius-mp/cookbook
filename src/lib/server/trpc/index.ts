@@ -1,12 +1,14 @@
+import type { RequestEvent } from '@sveltejs/kit';
 import type { inferAsyncReturnType } from '@trpc/server';
-import trpcTransformer from 'trpc-transformer';
 import * as trpc from '@trpc/server';
+import trpcTransformer from 'trpc-transformer';
+import { ZodError } from 'zod';
+
+import themeRouter from '$lib/server/trpc/theme';
+import userRouter from '$lib/server/trpc/user';
+
 import itemRouter from './item';
 import recipeRouter from './recipe';
-import userRouter from '$lib/server/trpc/user';
-import { ZodError } from 'zod';
-import type { RequestEvent } from '@sveltejs/kit';
-import themeRouter from '$lib/server/trpc/theme';
 
 export const createContext = async (event: RequestEvent) => {
 	const user = event.locals.user;

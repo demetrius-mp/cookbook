@@ -1,6 +1,4 @@
 <script lang="ts" context="module">
-	import type { Load } from '@sveltejs/kit';
-
 	export const load: Load = ({ session }) => {
 		if (session.user) {
 			return {
@@ -12,13 +10,15 @@
 </script>
 
 <script lang="ts">
+	import type { Load } from '@sveltejs/kit';
+	import { TRPCClientError } from '@trpc/client';
+	import { createForm } from 'svelte-forms-lib';
+	import type { ZodFormattedError } from 'zod';
+
+	import { goto } from '$app/navigation';
+	import InputError from '$lib/components/Forms/InputError/InputError.svelte';
 	import toastStore from '$lib/components/Toast/toast.store';
 	import trpcClient, { type InferMutationInput } from '$lib/trpcClient';
-	import { createForm } from 'svelte-forms-lib';
-	import { TRPCClientError } from '@trpc/client';
-	import InputError from '$lib/components/Forms/InputError/InputError.svelte';
-	import type { ZodFormattedError } from 'zod';
-	import { goto } from '$app/navigation';
 
 	type SignInUser = InferMutationInput<'users:sign-up'>;
 	type SignInUserError = ZodFormattedError<SignInUser>;

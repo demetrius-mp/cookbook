@@ -1,8 +1,9 @@
 <script lang="ts" context="module">
-	import { BottomNavigation } from '$lib/components/Navigation/';
+	import type { Load } from '@sveltejs/kit';
+	
 	import IconBookOpen from '$lib/components/Icons/IconBookOpen.svelte';
 	import IconShoppingBag from '$lib/components/Icons/IconShoppingBag.svelte';
-	import type { Load } from '@sveltejs/kit';
+	import { BottomNavigation } from '$lib/components/Navigation/';
 
 	export const load: Load = ({ session }) => {
 		if (!session.user) {

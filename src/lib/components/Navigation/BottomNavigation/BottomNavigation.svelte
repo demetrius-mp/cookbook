@@ -1,6 +1,7 @@
 <script lang="ts">
-	import { page } from '$app/stores';
 	import type { SvelteComponent } from 'svelte';
+	
+	import { page } from '$app/stores';
 
 	interface BottomNavigationOption {
 		label: string;

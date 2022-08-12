@@ -1,8 +1,9 @@
-import prisma from '$lib/server/prisma';
-import { createProtectedRouter, filterByUserId } from '$lib/server/trpc/utils';
 import type { Prisma } from '@prisma/client';
 import * as trpc from '@trpc/server';
 import { z } from 'zod';
+
+import prisma from '$lib/server/prisma';
+import { createProtectedRouter, filterByUserId } from '$lib/server/trpc/utils';
 
 const itemRouter = createProtectedRouter()
 	.query('findById', {

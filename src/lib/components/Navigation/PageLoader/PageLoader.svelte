@@ -1,8 +1,9 @@
 <script>
-	import { tweened } from 'svelte/motion';
-	import { cubicOut } from 'svelte/easing';
-	import { navigating } from '$app/stores';
 	import { onDestroy } from 'svelte';
+	import { cubicOut } from 'svelte/easing';
+	import { tweened } from 'svelte/motion';
+	
+	import { navigating } from '$app/stores';
 
 	const progress = tweened(0, { easing: cubicOut });
 	const opacity = tweened(1, { easing: cubicOut });

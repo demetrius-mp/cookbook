@@ -1,5 +1,6 @@
 import type { Writable } from 'svelte/store';
 import { writable } from 'svelte/store';
+
 import type { Toast, ToastCreateInput } from './types';
 
 type ToastStore = {

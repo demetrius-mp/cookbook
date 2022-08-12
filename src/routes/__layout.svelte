@@ -1,4 +1,8 @@
 <script lang="ts">
+	import '../app.css';
+	
+	import qs from 'query-string';
+	
 	import { afterNavigate } from '$app/navigation';
 	import { page, session } from '$app/stores';
 	import Container from '$lib/components/Container/Container.svelte';
@@ -8,8 +12,6 @@
 	import { PageLoader } from '$lib/components/Navigation';
 	import toastStore from '$lib/components/Toast/toast.store';
 	import ToastContainer from '$lib/components/Toast/ToastContainer.svelte';
-	import qs from 'query-string';
-	import '../app.css';
 
 	afterNavigate(() => {
 		const queryParams = qs.parse($page.url.search) as {

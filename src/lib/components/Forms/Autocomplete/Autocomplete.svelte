@@ -1,8 +1,8 @@
 <script lang="ts">
-	import Spinner from '$lib/components/Spinner/Spinner.svelte';
-
 	import { debounce, uniqBy } from 'lodash-es';
 	import { createEventDispatcher } from 'svelte';
+	
+	import Spinner from '$lib/components/Spinner/Spinner.svelte';
 
 	type T = $$Generic;
 

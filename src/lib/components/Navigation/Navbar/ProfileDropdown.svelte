@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { session } from '$app/stores';
-
-	import IconLogout from '$lib/components/Icons/IconLogout.svelte';
+import IconLogout from '$lib/components/Icons/IconLogout.svelte';
 	import IconUser from '$lib/components/Icons/IconUser.svelte';
 	import trpcClient from '$lib/trpcClient';
 

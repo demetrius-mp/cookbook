@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-
-	import ItemForm from '$lib/components/Forms/ItemForm/ItemForm.svelte';
+import ItemForm from '$lib/components/Forms/ItemForm/ItemForm.svelte';
 	import { TitleWithGoBackIcon } from '$lib/components/Navigation';
 </script>
 
