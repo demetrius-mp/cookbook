@@ -4,7 +4,7 @@
 	import { flip } from 'svelte/animate';
 	import { fade } from 'svelte/transition';
 	import { createForm } from 'svelte-forms-lib';
-	
+
 	import { goto } from '$app/navigation';
 	import overflow from '$lib/actions/overflow.action';
 	import IconClipboard from '$lib/components/Icons/IconClipboard.svelte';
@@ -189,7 +189,7 @@
 			{@const liked = userLikedRecipe(recipe)}
 			<li
 				animate:flip={{ duration: 500 }}
-				transition:fade={{ duration: 250 }}
+				transition:fade|local={{ duration: 250 }}
 				class="col-span-1 flex flex-col rounded-lg"
 			>
 				<div class="card bg-base-200 shadow-xl h-96 overflow-visible">
