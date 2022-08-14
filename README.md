@@ -32,18 +32,19 @@ Recommended value: the output of the `openssl rand -hex 32` command.
 - [x] Sharing link for recipes.
 - [x] Create copy of recipes to your own account.
 - [x] Like/dislike recipes.
-- [x] Enchanced app navigation with drawers, tabs, and back buttons.
+- [x] Enchanced app navigation with drawers, tabs, back buttons, and bottom navigation.
+- [x] Different layouts built specifically for mobile and desktop environments.
 - [x] Enchanced form experience by allowing to create items without leaving the recipe page.
 
 # Known Issues
 
-- Recipes and item deletions might not work properly due to referential integrity.
-
-- When creating an item using the `Create a new item` option in the autocomplete input, it will create a new entry on the recipe for the created item, instead of replacing the current one (if you created it from an entry that already had a value set).
+- Dropdowns won't close when clicking outise in iOS ([daisyui issue](https://github.com/saadeghi/daisyui/issues/824))
 
 # Possible improvements
 
 - Use a modal instead of native js `confirm` to confirm delete and other critical actions.
+
+- Manage environment variables the SvelteKit way (with `$env/` modules).
 
 # My personal experience with this stack
 

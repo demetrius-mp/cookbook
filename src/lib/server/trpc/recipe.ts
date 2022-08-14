@@ -1,4 +1,4 @@
-import { type Recipe,Prisma } from '@prisma/client';
+import { type Recipe, Prisma } from '@prisma/client';
 import * as trpc from '@trpc/server';
 import { z } from 'zod';
 
@@ -25,6 +25,14 @@ const recipeRouter = createProtectedRouter()
 							item: {
 								select: prisma.$exclude('item', ['updatedAt', 'createdAt', 'updatedAt'])
 							}
+						}
+					},
+					likedByUsers: {
+						select: {
+							userId: true
+						},
+						where: {
+							userId: ctx.user.id
 						}
 					},
 					_count: true

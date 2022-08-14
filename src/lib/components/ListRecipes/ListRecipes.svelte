@@ -1,146 +1,16 @@
 <script lang="ts">
-	import { TRPCClientError } from '@trpc/client';
-	import { createEventDispatcher } from 'svelte';
 	import { flip } from 'svelte/animate';
 	import { fade } from 'svelte/transition';
 	import { createForm } from 'svelte-forms-lib';
 
-	import { goto } from '$app/navigation';
-	import overflow from '$lib/actions/overflow.action';
-	import IconClipboard from '$lib/components/Icons/IconClipboard.svelte';
-	import IconDotsVertical from '$lib/components/Icons/IconDotsVertical.svelte';
-	import IconHeart from '$lib/components/Icons/IconHeart.svelte';
-	import IconPencilAlt from '$lib/components/Icons/IconPencilAlt.svelte';
 	import IconSearch from '$lib/components/Icons/IconSearch.svelte';
-	import IconShare from '$lib/components/Icons/IconShare.svelte';
-	import IconTrash from '$lib/components/Icons/IconTrash.svelte';
+	import RecipeCard from '$lib/components/ListRecipes/RecipeCard.svelte';
 	import { Pagination } from '$lib/components/Navigation';
-	import toastStore from '$lib/components/Toast/toast.store';
-	import trpcClient, { type InferMutationOutput, type InferQueryOutput } from '$lib/trpcClient';
-	import { formatCurrency } from '$lib/utils/formatting.util';
+	import trpcClient, { type InferQueryOutput } from '$lib/trpcClient';
 
 	export let recipes: InferQueryOutput<'recipes:list'>;
 	export let viewType: 'own' | 'browsing' = 'browsing';
 	export let loadRecipes: (options: { query: string; page: number }) => Promise<typeof recipes>;
-
-	$: computedRecipes = recipes.recipes.map((recipe) => {
-		const recipeItems = recipe.items.map((item) => {
-			return {
-				...item,
-				computedPrice: (item.amount * item.item.price) / item.item.baseAmount
-			};
-		});
-
-		return {
-			...recipe,
-			items: recipeItems,
-			totalPrice: recipeItems.reduce((partial, { computedPrice }) => partial + computedPrice, 0)
-		};
-	});
-
-	function userLikedRecipe(recipe: typeof recipes.recipes[number]) {
-		return recipe.likedByUsers.length > 0;
-	}
-
-	async function handleDeleteRecipe(id: string) {
-		const confirmDelete = confirm('Are you sure you want to delete this item?');
-		if (!confirmDelete) return;
-
-		await trpcClient().mutation('recipes:delete', id);
-
-		toastStore.push({
-			kind: 'success',
-			message: 'Item deleted successfully',
-			removeAfter: 2000
-		});
-
-		recipes = await trpcClient().query('recipes:list');
-	}
-
-	async function handleEditRecipe(id: string) {
-		await goto(`/app/recipes/${id}/edit`);
-	}
-
-	async function handleShareRecipe(id: string) {
-		try {
-			const sharingLink = `${window.location.origin}/app/recipes/${id}`;
-
-			if (!navigator.canShare) {
-				navigator.clipboard.writeText(sharingLink);
-
-				toastStore.push({
-					kind: 'success',
-					message: 'Copied sharing link to clipboard!',
-					removeAfter: 2000
-				});
-
-				return;
-			}
-
-			navigator.share({
-				url: sharingLink,
-				title: 'Check out my recipe!'
-			});
-		} catch (e) {
-			if (e instanceof TRPCClientError) {
-				console.error(e);
-			}
-		}
-	}
-
-	async function handleCopyRecipe(id: string) {
-		try {
-			const loadingToastId = toastStore.push({
-				kind: 'loading',
-				message: 'Copying recipe...',
-				removeAfter: 'never'
-			});
-
-			await trpcClient().mutation('recipes:saveCopy', id);
-
-			toastStore.close(loadingToastId);
-
-			toastStore.push({
-				kind: 'success',
-				message: 'Recipe copied successfully!',
-				removeAfter: 3000
-			});
-
-			await goto('/app/recipes');
-		} catch (e) {
-			if (e instanceof TRPCClientError) {
-				console.error(e);
-			}
-		}
-	}
-
-	async function handleLikeRecipe(id: string) {
-		try {
-			const result = await trpcClient().mutation('recipes:like', {
-				id
-			});
-
-			dispatch('like', {
-				id,
-				result
-			});
-		} catch (e) {
-			if (e instanceof TRPCClientError) {
-				console.error(e);
-			}
-		}
-	}
-
-	function closeDropdown() {
-		(document.activeElement as HTMLElement).blur();
-	}
-
-	const dispatch = createEventDispatcher<{
-		like: {
-			id: string;
-			result: InferMutationOutput<'recipes:like'>;
-		};
-	}>();
 
 	const { form, isSubmitting, handleSubmit } = createForm({
 		initialValues: {
@@ -174,7 +44,7 @@
 	</div>
 </form>
 
-{#if computedRecipes.length > 0}
+{#if recipes.recipes.length > 0}
 	<div class="mb-3">
 		<Pagination
 			pageSize={recipes.pageSize}
@@ -185,14 +55,19 @@
 		/>
 	</div>
 	<ul class:loading-state={$isSubmitting} class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-		{#each computedRecipes as recipe (recipe.id)}
-			{@const liked = userLikedRecipe(recipe)}
+		{#each recipes.recipes as recipe (recipe.id)}
 			<li
 				animate:flip={{ duration: 500 }}
 				transition:fade|local={{ duration: 250 }}
 				class="col-span-1 flex flex-col rounded-lg"
 			>
-				<div class="card bg-base-200 shadow-xl h-96 overflow-visible">
+				<RecipeCard
+					{recipe}
+					{viewType}
+					on:like
+					on:delete={async () => (recipes = await trpcClient().query('recipes:list'))}
+				/>
+				<!-- <div class="card bg-base-200 shadow-xl h-96 overflow-visible">
 					<div class="card-body p-5 justify-evenly">
 						<div class="flex justify-between gap-3">
 							<h2 class="card-title">
@@ -282,7 +157,7 @@
 							</div>
 						</div>
 					</div>
-				</div>
+				</div> -->
 			</li>
 		{/each}
 	</ul>

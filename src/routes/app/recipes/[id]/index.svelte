@@ -6,8 +6,12 @@
 		});
 
 		if (!recipe) {
+			const queryParams = qs.stringify({
+				redirectReason: 'The recipe does not exist.'
+			});
+
 			return {
-				redirect: '/app/recipes',
+				redirect: `/app/recipes?${queryParams}`,
 				status: 302
 			};
 		}
@@ -22,8 +26,9 @@
 
 <script lang="ts">
 	import type { Load } from '@sveltejs/kit';
-	
-	import ListRecipes from '$lib/components/ListRecipes/ListRecipes.svelte';
+	import qs from 'query-string';
+
+	import RecipeCard from '$lib/components/ListRecipes/RecipeCard.svelte';
 	import trpcClient, { type InferQueryOutput } from '$lib/trpcClient';
 
 	export let recipe: InferQueryOutput<'recipes:findById'>;
@@ -31,5 +36,5 @@
 
 <h3 class="text-4xl font-bold text-center mb-5">View recipe</h3>
 {#if recipe}
-	<ListRecipes recipes={[recipe]} />
+	<RecipeCard {recipe} viewType="browsing" />
 {/if}
