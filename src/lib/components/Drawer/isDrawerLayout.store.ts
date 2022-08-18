@@ -1,4 +1,4 @@
-import { type Readable,derived } from 'svelte/store';
+import { type Readable, derived } from 'svelte/store';
 
 import { page, session } from '$app/stores';
 

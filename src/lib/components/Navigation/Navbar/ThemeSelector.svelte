@@ -3,7 +3,7 @@
 	import IconColorSwatch from '$lib/components/Icons/IconColorSwatch.svelte';
 	import IconDropdown from '$lib/components/Icons/IconDropdown.svelte';
 	import trpcClient from '$lib/trpcClient';
-	import { type Theme,themes } from '$lib/utils/theme.util';
+	import { type Theme, themes } from '$lib/utils/theme.util';
 
 	async function handleSetTheme(theme: Theme) {
 		try {

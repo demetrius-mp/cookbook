@@ -3,7 +3,7 @@
 	import { MD5 } from 'crypto-js';
 	import { createForm } from 'svelte-forms-lib';
 	import type { ZodFormattedError } from 'zod';
-	
+
 	import { goto } from '$app/navigation';
 	import { session } from '$app/stores';
 	import InputError from '$lib/components/Forms/InputError/InputError.svelte';

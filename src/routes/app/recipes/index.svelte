@@ -12,7 +12,7 @@
 
 <script lang="ts">
 	import type { Load } from '@sveltejs/kit';
-	
+
 	import ListRecipes from '$lib/components/ListRecipes/ListRecipes.svelte';
 	import trpcClient, { type InferQueryOutput } from '$lib/trpcClient';
 

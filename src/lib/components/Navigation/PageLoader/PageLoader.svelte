@@ -2,7 +2,7 @@
 	import { onDestroy } from 'svelte';
 	import { cubicOut } from 'svelte/easing';
 	import { tweened } from 'svelte/motion';
-	
+
 	import { navigating } from '$app/stores';
 
 	const progress = tweened(0, { easing: cubicOut });

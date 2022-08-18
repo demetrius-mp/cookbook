@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
-	
+
 	import Spinner from '$lib/components/Spinner/Spinner.svelte';
 
 	import toastStore from './toast.store';

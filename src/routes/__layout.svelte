@@ -1,8 +1,8 @@
 <script lang="ts">
 	import '../app.css';
-	
+
 	import qs from 'query-string';
-	
+
 	import { afterNavigate } from '$app/navigation';
 	import { page, session } from '$app/stores';
 	import Container from '$lib/components/Container/Container.svelte';

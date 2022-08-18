@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import { parse } from 'cookie';
 import jwt, { type VerifyOptions } from 'jsonwebtoken';
 
+import { JWT_SECRET_KEY } from '$env/static/private';
 import prisma from '$lib/server/prisma';
 
 export type JwtPayloadType = {
@@ -12,7 +13,7 @@ export type JwtPayloadType = {
 export default class AuthService {
 	static HASH_ROUNDS = 10;
 
-	static SECRET_KEY = import.meta.env.VITE_JWT_SECRET_KEY;
+	static SECRET_KEY = JWT_SECRET_KEY;
 
 	static EXPIRES_IN = import.meta.env.JWT_EXPIRES_IN || '1d';
 

@@ -14,7 +14,7 @@
 	import type { Load } from '@sveltejs/kit';
 	import { TRPCClientError } from '@trpc/client';
 	import { createForm } from 'svelte-forms-lib';
-	
+
 	import { goto } from '$app/navigation';
 	import IconPencilAlt from '$lib/components/Icons/IconPencilAlt.svelte';
 	import IconSearch from '$lib/components/Icons/IconSearch.svelte';

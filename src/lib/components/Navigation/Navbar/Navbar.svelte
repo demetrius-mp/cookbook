@@ -3,7 +3,7 @@
 	import drawerStore from '$lib/components/Drawer/drawer.store';
 	import isDrawerLayoutStore from '$lib/components/Drawer/isDrawerLayout.store';
 	import IconMenu from '$lib/components/Icons/IconMenu.svelte';
-	
+
 	import ProfileDropdown from './ProfileDropdown.svelte';
 	import ThemeSelector from './ThemeSelector.svelte';
 </script>
